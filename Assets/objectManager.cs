@@ -28,14 +28,13 @@ public class objectManager : MonoBehaviour
     private GameObject hitObject;
 
     //--------------EVENT-----------------
-    //Fired when the object is released by the mouse
-    public event Action OnObjectReleased;
+    public event Action OnObjectReleased; //Fired when the object is released by the mouse
 
     // Update is called once per frame
     void Update()
     {
         mousePosition_ = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        
+
         if (Input.GetKeyDown(KeyCode.Mouse0) && hitObject == null)
         {
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -47,13 +46,15 @@ public class objectManager : MonoBehaviour
                     hitObject = h.collider.gameObject;
                     boxDetection[] boxDetections = hitObject.GetComponentsInChildren<boxDetection>();
                     foreach (boxDetection bD in boxDetections)
-                    { 
+                    {
                         bD.enabled = true;
                     }
 
                     break;
                 }
             }
+
+            ResetZPosition();
         }
 
         if (Input.GetKey(KeyCode.Mouse0) && hitObject != null)
@@ -73,12 +74,24 @@ public class objectManager : MonoBehaviour
         {
             DetachFromMouse(hitObject);
             OnObjectReleased?.Invoke(); // Shoots a ray from the cubes
+
             boxDetection[] boxDetections = hitObject.GetComponentsInChildren<boxDetection>();
             foreach (boxDetection bD in boxDetections)
             {
                 bD.enabled = false;
             }
             hitObject = null;
+        }
+    }
+
+    //Resets all the main objects to 0 on Z axis
+    private void ResetZPosition()
+    {
+        GameObject[] mainObjects = GameObject.FindGameObjectsWithTag("MainObject");
+
+        foreach (GameObject mO in mainObjects)
+        {
+            mO.transform.position = new Vector3(mO.transform.position.x, mO.transform.position.y, 0);
         }
     }
 
@@ -120,7 +133,7 @@ public class objectManager : MonoBehaviour
     {
         float posX = Mathf.Round(gameObj.transform.position.x);
         float posY = Mathf.Round(gameObj.transform.position.y);
-        gameObj.transform.position = new Vector2(posX, posY);
+        gameObj.transform.position = new Vector3(posX, posY, -0.1f);
     }
 
     private void AttachToMouse(GameObject gameObj)
