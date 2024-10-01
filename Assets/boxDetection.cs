@@ -6,10 +6,14 @@ using TMPro;
 public class boxDetection : MonoBehaviour
 {
     private TMP_Text myNumber;
+    private string newText;
 
-    private string originalText;
+    //Storing the component and string of the collided GameObject so that we can reset it later
+    private TMP_Text colliderNum = null;
+    private string collidedText = "";
 
-    public string newText;
+    public string originalText;
+
 
     private void Awake()
     {
@@ -29,24 +33,32 @@ public class boxDetection : MonoBehaviour
 
     private void Start()
     {
-        this.GetComponent<boxDetection>().enabled = false;
+        GetComponent<boxDetection>().enabled = false;
 
         originalText = myNumber.text;
     }
 
     public void ShootRay()
     {
+        if (colliderNum != null)
+        { 
+            colliderNum.text = collidedText;
+        }
+
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction);
 
         foreach (var h in hit)
-        { 
+        {
             if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
             {
-                Debug.Log(h.collider.gameObject.name);
-                TMP_Text colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
-                newText = colliderNum.text + myNumber.text;
-            }        
+                colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
+                collidedText = colliderNum.text;
+
+                newText =  myNumber.text + colliderNum.text;
+                Debug.Log(newText);
+                myNumber.text = EquationEvaluator.Evaluate(newText);
+            }
         }
     }
 }

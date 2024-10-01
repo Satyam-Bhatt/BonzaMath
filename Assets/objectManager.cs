@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class objectManager : MonoBehaviour
 {
@@ -48,6 +49,7 @@ public class objectManager : MonoBehaviour
                     foreach (boxDetection bD in boxDetections)
                     {
                         bD.enabled = true;
+                        bD.transform.GetComponentInChildren<TMP_Text>().text = bD.originalText;
                     }
 
                     break;
@@ -138,6 +140,6 @@ public class objectManager : MonoBehaviour
 
     private void AttachToMouse(GameObject gameObj)
     {
-        gameObj.transform.position = mousePosition_;
+        gameObj.transform.position = new Vector3(mousePosition_.x, mousePosition_.y, -0.1f);
     }
 }

@@ -576,7 +576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ea08f464e519784c931c884dc7bb31b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  input: 2*3+1
+  input: 2+2-3+
   output: 
 --- !u!4 &502268322
 Transform:
