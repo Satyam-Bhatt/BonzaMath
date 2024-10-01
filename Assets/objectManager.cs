@@ -48,8 +48,8 @@ public class objectManager : MonoBehaviour
                     boxDetection[] boxDetections = hitObject.GetComponentsInChildren<boxDetection>();
                     foreach (boxDetection bD in boxDetections)
                     {
-                        bD.enabled = true;
-                        bD.transform.GetComponentInChildren<TMP_Text>().text = bD.originalText;
+                        bD.Subscribe();
+                        bD.ResetText();
                     }
 
                     break;
@@ -80,7 +80,8 @@ public class objectManager : MonoBehaviour
             boxDetection[] boxDetections = hitObject.GetComponentsInChildren<boxDetection>();
             foreach (boxDetection bD in boxDetections)
             {
-                bD.enabled = false;
+                bD.Unsubscribe();
+                //bD.enabled = false;
             }
             hitObject = null;
         }

@@ -9,20 +9,15 @@ public class boxDetection : MonoBehaviour
     private string newText;
 
     //Storing the component and string of the collided GameObject so that we can reset it later
-    private TMP_Text colliderNum = null;
-    private string collidedText = "";
+    [HideInInspector] public TMP_Text colliderNum = null;
+    [HideInInspector] public string collidedText = "";
 
-    public string originalText;
+    public string originalText { get; private set; }
 
 
     private void Awake()
     {
         myNumber = GetComponentInChildren<TMP_Text>();
-    }
-
-    private void OnEnable()
-    {
-        objectManager.Instance.OnObjectReleased += ShootRay;
     }
 
     private void OnDisable()
@@ -33,18 +28,11 @@ public class boxDetection : MonoBehaviour
 
     private void Start()
     {
-        GetComponent<boxDetection>().enabled = false;
-
         originalText = myNumber.text;
     }
 
     public void ShootRay()
     {
-        if (colliderNum != null)
-        { 
-            colliderNum.text = collidedText;
-        }
-
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction);
 
@@ -54,12 +42,36 @@ public class boxDetection : MonoBehaviour
             {
                 colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
                 collidedText = colliderNum.text;
+                h.collider.gameObject.GetComponent<boxDetection>().colliderNum = myNumber;
 
-                newText =  myNumber.text + colliderNum.text;
+                newText = myNumber.text + colliderNum.text;
                 Debug.Log(newText);
                 myNumber.text = EquationEvaluator.Evaluate(newText);
             }
         }
+    }
+
+    public void Subscribe()
+    {
+        objectManager.Instance.OnObjectReleased += ShootRay;
+    }
+
+    public void Unsubscribe()
+    {
+        if (objectManager.Instance != null)
+            objectManager.Instance.OnObjectReleased -= ShootRay;
+    }
+
+    public void ResetText()
+    {
+        myNumber.text = originalText;
+
+        if (colliderNum != null) { 
+            colliderNum.text = colliderNum.gameObject.GetComponentInParent<boxDetection>().originalText;
+            colliderNum.gameObject.GetComponentInParent<boxDetection>().collidedText = "";
+            colliderNum = null;
+        }
+        collidedText = "";
     }
 }
 
