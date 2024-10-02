@@ -30,16 +30,7 @@ public class objectManager : MonoBehaviour
 
     //--------------EVENT-----------------
     public event Action OnObjectReleased; //Fired when the object is released by the mouse
-
-    //--------------ALL NUMBER ADDITION-----------------
-    public string allNumberSum = "";
-    public boxDetection[] componenet_BoxDetection; //Contains all the active boxDetection Components in the scene
-
-    private void Start()
-    {
-        componenet_BoxDetection = FindObjectsOfType<boxDetection>();
-        allNumberSum = CalculateTotal(componenet_BoxDetection);
-    }
+    public event Action UpdateTotalText; //Updates the total text
 
     // Update is called once per frame
     void Update()
@@ -95,7 +86,7 @@ public class objectManager : MonoBehaviour
             }
             hitObject = null;
 
-            allNumberSum = CalculateTotal(componenet_BoxDetection);
+            UpdateTotalText?.Invoke();
         }
     }
 
@@ -154,40 +145,5 @@ public class objectManager : MonoBehaviour
     private void AttachToMouse(GameObject gameObj)
     {
         gameObj.transform.position = new Vector3(mousePosition_.x, mousePosition_.y, -0.1f);
-    }
-
-    //Calculates the total of all the numbers present on the screen
-    private string CalculateTotal(boxDetection[] bD)
-    {
-        string allNumbers = "";
-
-        for (int i = 0; i < bD.Length; i++)
-        {
-
-            // if character is not an operator add it to the eqation
-            char[] charsInText = bD[i].GetComponentInChildren<TMP_Text>().text.ToCharArray();
-            foreach (char c in charsInText)
-            {
-                if (!IsOperator(c.ToString()))
-                {
-                    allNumbers += c.ToString();
-                }
-            }
-
-            //if the character is not last or is not empty then add + to the equation
-            if (i != componenet_BoxDetection.Length - 1 && bD[i].GetComponentInChildren<TMP_Text>().text != "")
-            {
-                allNumbers += "+";
-            }
-        }
-
-        Debug.Log(allNumbers);
-        string total =  EquationEvaluator.Evaluate(allNumbers);
-        return allNumbers += "=" + total;
-    }
-
-    private bool IsOperator(string op)
-    {
-        return op == "+" || op == "-" || op == "*" || op == "/";
     }
 }
