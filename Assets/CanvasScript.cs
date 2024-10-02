@@ -1,7 +1,9 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
+using System.Linq;
 
 public class CanvasScript : MonoBehaviour
 {
@@ -16,7 +18,8 @@ public class CanvasScript : MonoBehaviour
 
     private void OnDisable()
     {
-        objectManager.Instance.UpdateTotalText -= UpdateText;
+        if (objectManager.Instance != null)
+            objectManager.Instance.UpdateTotalText -= UpdateText;
     }
 
     private void Start()
@@ -36,11 +39,30 @@ public class CanvasScript : MonoBehaviour
         }
 
         allNumbers = allNumbers.Replace("-", "+").Replace("*", "+").Replace("/", "+");
+        allNumbers = allNumbers.Remove(allNumbers.Length - 1);
 
-        Debug.Log(allNumbers);
         string total = EquationEvaluator.Evaluate(allNumbers);
-        allNumbers += "=" + total;
+        string allNumbersWithoutRichText = allNumbers + " = " + total;
+        allNumbers += "= <color=orange>" + total + "</color>";
 
         totalText.text = allNumbers;
+
+        WinCheckAndTextUpdate(allNumbersWithoutRichText);
+
+    }
+
+    private void WinCheckAndTextUpdate(string finalTotal)
+    {
+        finalTotal = finalTotal.Split("=").Last();
+        Debug.Log(finalTotal);
+        if (float.Parse(finalTotal) == GameManager.Instance.win_Total)
+        {
+            totalText.text += "\n" + finalTotal + "<color=green><b> =" + GameManager.Instance.win_Total + "<b></color>";
+            GameManager.Instance.Win();
+        }
+        else
+        {
+            totalText.text +="\n <color=orange>" + finalTotal +  "</color><color=red><b> ≠" + GameManager.Instance.win_Total + "<b></color>";
+        }
     }
 }
