@@ -45,8 +45,9 @@ public class boxDetection : MonoBehaviour
                 h.collider.gameObject.GetComponent<boxDetection>().colliderNum = myNumber;
 
                 newText = myNumber.text + colliderNum.text;
-                Debug.Log(newText);
-                myNumber.text = EquationEvaluator.Evaluate(newText);
+                //Debug.Log(newText);
+                colliderNum.text = "";
+                myNumber.text = EquationEvaluator.Evaluate(newText) + originalText.ToCharArray()[1].ToString();
             }
         }
     }

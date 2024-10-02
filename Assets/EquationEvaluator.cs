@@ -38,19 +38,6 @@ public static class EquationEvaluator
         return finalValue.ToString();
     }
 
-    public static float EvaluateTotal(string equation)
-    {
-        float finalValue = 0;
-
-        for (int i = 0; i < equation.Length; i += 2)
-        {
-            string num = equation.ToCharArray()[i].ToString();
-            finalValue += float.Parse(num);
-        }
-
-        return finalValue;
-    }
-
     private static bool IsOperator(string c)
     {
         return c == "+" || c == "-" || c == "*" || c == "/";
