@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,9 +21,4 @@ public class GameManager : MonoBehaviour
     }
 
     [field:SerializeField] public int win_Total { get; private set; } = 0;
-
-    public void Win()
-    {
-        Debug.Log("Win");
-    }
 }

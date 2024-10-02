@@ -4,12 +4,16 @@ using UnityEngine;
 using TMPro;
 using System;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class CanvasScript : MonoBehaviour
 {
     //-----------------TOTAL TEXT-----------------
     private boxDetection[] boxDetection_Components;
     [SerializeField] private TMP_Text totalText;
+
+    //-----------------WIN PANEL-----------------
+    [SerializeField] private GameObject winPanel;
 
     private void OnEnable()
     {
@@ -25,6 +29,7 @@ public class CanvasScript : MonoBehaviour
     private void Start()
     {
         boxDetection_Components = FindObjectsOfType<boxDetection>();
+        winPanel.SetActive(false);
         UpdateText();
     }
 
@@ -43,7 +48,7 @@ public class CanvasScript : MonoBehaviour
 
         string total = EquationEvaluator.Evaluate(allNumbers);
         string allNumbersWithoutRichText = allNumbers + " = " + total;
-        allNumbers += "= <color=orange>" + total + "</color>";
+        allNumbers += "=<color=orange>" + total + "</color>";
 
         totalText.text = allNumbers;
 
@@ -54,15 +59,21 @@ public class CanvasScript : MonoBehaviour
     private void WinCheckAndTextUpdate(string finalTotal)
     {
         finalTotal = finalTotal.Split("=").Last();
-        Debug.Log(finalTotal);
         if (float.Parse(finalTotal) == GameManager.Instance.win_Total)
         {
-            totalText.text += "\n" + finalTotal + "<color=green><b> =" + GameManager.Instance.win_Total + "<b></color>";
-            GameManager.Instance.Win();
+            totalText.text += "\n<color=orange>" + finalTotal + "</color><color=green><b>=" + GameManager.Instance.win_Total + "<b></color>";
+            winPanel.SetActive(true);
         }
         else
         {
-            totalText.text +="\n <color=orange>" + finalTotal +  "</color><color=red><b> ≠" + GameManager.Instance.win_Total + "<b></color>";
+            totalText.text +="\n<color=orange>" + finalTotal +  "</color><color=red><b>≠" + GameManager.Instance.win_Total + "<b></color>";
         }
+    }
+
+    public void NextLevel()
+    {
+        Debug.Log("Next Level");
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex++);
     }
 }

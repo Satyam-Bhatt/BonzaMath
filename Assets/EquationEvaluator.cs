@@ -34,6 +34,10 @@ public static class EquationEvaluator
                     finalValue = Calculate(a, b, equationElements[i]);
                 }
             }
+            else if (equationElements.Count == 1 && !IsOperator(equationElements[0])) // if there is only one element in the equation
+            { 
+                finalValue = float.Parse(equationElements[0]);
+            }
         }
 
         return finalValue.ToString();
