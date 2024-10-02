@@ -17,20 +17,20 @@ public class CanvasScript : MonoBehaviour
 
     private void OnEnable()
     {
-        objectManager.Instance.UpdateTotalText += UpdateText;
+        //objectManager.Instance.UpdateTotalText += UpdateText;
     }
 
     private void OnDisable()
     {
-        if (objectManager.Instance != null)
-            objectManager.Instance.UpdateTotalText -= UpdateText;
+        //if (objectManager.Instance != null)
+            //objectManager.Instance.UpdateTotalText -= UpdateText;
     }
 
     private void Start()
     {
         boxDetection_Components = FindObjectsOfType<boxDetection>();
         winPanel.SetActive(false);
-        UpdateText();
+        //UpdateText();
     }
 
     //Updates the text that shows the total value

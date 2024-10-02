@@ -44,10 +44,10 @@ public class boxDetection : MonoBehaviour
                 collidedText = colliderNum.text;
                 h.collider.gameObject.GetComponent<boxDetection>().colliderNum = myNumber;
 
-                newText = myNumber.text + colliderNum.text;
+                newText = NumberOpertatorCombine() + colliderNum.text;
                 //Debug.Log(newText);
                 colliderNum.text = "";
-                myNumber.text = EquationEvaluator.Evaluate(newText) + originalText.ToCharArray()[1].ToString();
+                myNumber.text = EquationEvaluator.Evaluate(newText); // + originalText.ToCharArray()[1].ToString();
             }
         }
     }
@@ -73,6 +73,17 @@ public class boxDetection : MonoBehaviour
             colliderNum = null;
         }
         collidedText = "";
+    }
+
+    private string NumberOpertatorCombine()
+    {
+        TMP_Text[] numberPlusOperator = GetComponentsInChildren<TMP_Text>();
+        string numberWithOperator = "";
+        foreach (var n in numberPlusOperator)
+        {
+            numberWithOperator += n.text;
+        }
+        return numberWithOperator;
     }
 }
 
