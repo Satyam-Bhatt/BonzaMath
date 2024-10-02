@@ -17,20 +17,20 @@ public class CanvasScript : MonoBehaviour
 
     private void OnEnable()
     {
-        //objectManager.Instance.UpdateTotalText += UpdateText;
+        objectManager.Instance.UpdateTotalText += UpdateText;
     }
 
     private void OnDisable()
     {
-        //if (objectManager.Instance != null)
-            //objectManager.Instance.UpdateTotalText -= UpdateText;
+        if (objectManager.Instance != null)
+            objectManager.Instance.UpdateTotalText -= UpdateText;
     }
 
     private void Start()
     {
         boxDetection_Components = FindObjectsOfType<boxDetection>();
         winPanel.SetActive(false);
-        //UpdateText();
+        UpdateText();
     }
 
     //Updates the text that shows the total value
@@ -40,11 +40,14 @@ public class CanvasScript : MonoBehaviour
 
         for (int i = 0; i < boxDetection_Components.Length; i++)
         {
-            allNumbers += boxDetection_Components[i].GetComponentInChildren<TMP_Text>().text;
+            if (boxDetection_Components[i].GetComponentInChildren<TMP_Text>().text != "")
+            { 
+                allNumbers += boxDetection_Components[i].GetComponentInChildren<TMP_Text>().text + "+";
+            }
         }
 
-        allNumbers = allNumbers.Replace("-", "+").Replace("*", "+").Replace("/", "+");
         allNumbers = allNumbers.Remove(allNumbers.Length - 1);
+         Debug.Log(allNumbers);
 
         string total = EquationEvaluator.Evaluate(allNumbers);
         string allNumbersWithoutRichText = allNumbers + " = " + total;
@@ -53,7 +56,6 @@ public class CanvasScript : MonoBehaviour
         totalText.text = allNumbers;
 
         WinCheckAndTextUpdate(allNumbersWithoutRichText);
-
     }
 
     private void WinCheckAndTextUpdate(string finalTotal)

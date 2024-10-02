@@ -45,9 +45,8 @@ public class boxDetection : MonoBehaviour
                 h.collider.gameObject.GetComponent<boxDetection>().colliderNum = myNumber;
 
                 newText = NumberOpertatorCombine() + colliderNum.text;
-                //Debug.Log(newText);
                 colliderNum.text = "";
-                myNumber.text = EquationEvaluator.Evaluate(newText); // + originalText.ToCharArray()[1].ToString();
+                myNumber.text = EquationEvaluator.Evaluate(newText);
             }
         }
     }
@@ -75,6 +74,7 @@ public class boxDetection : MonoBehaviour
         collidedText = "";
     }
 
+    //Gets the two text fields one containg the number and the other containing the operator and combines them
     private string NumberOpertatorCombine()
     {
         TMP_Text[] numberPlusOperator = GetComponentsInChildren<TMP_Text>();
