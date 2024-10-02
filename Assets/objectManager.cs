@@ -163,24 +163,31 @@ public class objectManager : MonoBehaviour
 
         for (int i = 0; i < bD.Length; i++)
         {
-            /*            foreach (char c in bD[i].GetComponentInChildren<TMP_Text>().text.ToCharArray())
-                        {
-                            Debug.Log(c);
-                        }*/
 
-            if (bD[i].GetComponentInChildren<TMP_Text>().text.ToCharArray().Length > 0)
-            { 
-            allNumbers += bD[i].GetComponentInChildren<TMP_Text>().text.ToCharArray()[0].ToString();
-            
+            // if character is not an operator add it to the eqation
+            char[] charsInText = bD[i].GetComponentInChildren<TMP_Text>().text.ToCharArray();
+            foreach (char c in charsInText)
+            {
+                if (!IsOperator(c.ToString()))
+                {
+                    allNumbers += c.ToString();
+                }
             }
 
+            //if the character is not last or is not empty then add + to the equation
             if (i != componenet_BoxDetection.Length - 1 && bD[i].GetComponentInChildren<TMP_Text>().text != "")
             {
                 allNumbers += "+";
             }
         }
 
-        string total = "";// EquationEvaluator.Evaluate(allNumbers);
-        return allNumbers;// += "=" + total;
+        Debug.Log(allNumbers);
+        string total =  EquationEvaluator.Evaluate(allNumbers);
+        return allNumbers += "=" + total;
+    }
+
+    private bool IsOperator(string op)
+    {
+        return op == "+" || op == "-" || op == "*" || op == "/";
     }
 }
