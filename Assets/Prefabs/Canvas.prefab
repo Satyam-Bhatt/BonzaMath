@@ -491,7 +491,7 @@ GameObject:
   - component: {fileID: 2176885489928230401}
   - component: {fileID: 7487802882006124196}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: ControlsPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -956,7 +956,7 @@ GameObject:
   - component: {fileID: 7209807429141278922}
   - component: {fileID: 6127484473822930317}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: WinPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
