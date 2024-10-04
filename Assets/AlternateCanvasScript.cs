@@ -39,26 +39,22 @@ public class AlternateCanvasScript : MonoBehaviour
     //Updates the text that shows the total value
     public void UpdateText()
     {
+        Sort_Boxes();
+
         string allNumbers = "";
 
         for (int i = 0; i < boxDetection_Components.Length; i++)
         {
             if (boxDetection_Components[i].GetComponentInChildren<TMP_Text>().text != "")
             {
-                allNumbers += boxDetection_Components[i].GetComponentInChildren<TMP_Text>().text + "+";
+                allNumbers += boxDetection_Components[i].GetComponentInChildren<TMP_Text>().text;
             }
         }
 
-        allNumbers = allNumbers.Remove(allNumbers.Length - 1);
         Debug.Log(allNumbers);
-
-        string total = EquationEvaluator.Evaluate(allNumbers);
-        string allNumbersWithoutRichText = allNumbers + " = " + total;
-        allNumbers += "=<color=orange>" + total + "</color>";
-
         totalText.text = allNumbers;
 
-        WinCheckAndTextUpdate(allNumbersWithoutRichText);
+        WinCheckAndTextUpdate(allNumbers);
     }
 
     private void WinCheckAndTextUpdate(string finalTotal)
@@ -82,38 +78,33 @@ public class AlternateCanvasScript : MonoBehaviour
         SceneManager.LoadScene(currentSceneIndex++);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            Sort();
-        }
-    }
-
-    public int[] arr = new int[6] { 2, 9, 5, 4, 3, 8 };
-
-    private void Sort()
+    private void Sort_Boxes()
     {
         for (int i = 0; i < boxDetection_Components.Length; i++)
         {
             if (i + 1 >= boxDetection_Components.Length)
                 break;
 
-            if (boxDetection_Components[i].transform.position.y < boxDetection_Components[i + 1].transform.position.y)
+            boxDetection index_0 = boxDetection_Components[i];
+            float posY0 = Mathf.Round(index_0.transform.position.y);
+            boxDetection index_01 = boxDetection_Components[i + 1];
+            float posY01 = Mathf.Round(index_01.transform.position.y);
+
+            if (posY0 < posY01)
             {
                 boxDetection temp = boxDetection_Components[i];
                 boxDetection_Components[i] = boxDetection_Components[i + 1];
                 boxDetection_Components[i + 1] = temp;
-                Sort();
+                Sort_Boxes();
             }
-            else if (boxDetection_Components[i].transform.position.y == boxDetection_Components[i + 1].transform.position.y)
+            else if (posY0 == posY01)
             {
-                if (boxDetection_Components[i].transform.position.x > boxDetection_Components[i + 1].transform.position.x)
+                if (index_0.transform.position.x > index_01.transform.position.x)
                 {
                     boxDetection temp = boxDetection_Components[i];
                     boxDetection_Components[i] = boxDetection_Components[i + 1];
                     boxDetection_Components[i + 1] = temp;
-                    Sort();
+                    Sort_Boxes();
                 }
             }
         }
