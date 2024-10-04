@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class AlternateCanvasScript : MonoBehaviour
 {
     //-----------------TOTAL TEXT-----------------
-    private boxDetection[] boxDetection_Components;
+    [SerializeField] private boxDetection[] boxDetection_Components;
     [SerializeField] private TMP_Text totalText;
 
     //-----------------WIN PANEL-----------------
@@ -90,16 +90,31 @@ public class AlternateCanvasScript : MonoBehaviour
         }
     }
 
+    public int[] arr = new int[6] { 2, 9, 5, 4, 3, 8 };
+
     private void Sort()
     {
-        int indexToFill = 0;
-        float lowestX;
-        float HighestY;
-        while (boxDetection_Components_Sorted.Count != boxDetection_Components.Length)
+        for (int i = 0; i < boxDetection_Components.Length; i++)
         {
-            foreach (boxDetection bD in boxDetection_Components)
-            { 
-                
+            if (i + 1 >= boxDetection_Components.Length)
+                break;
+
+            if (boxDetection_Components[i].transform.position.y < boxDetection_Components[i + 1].transform.position.y)
+            {
+                boxDetection temp = boxDetection_Components[i];
+                boxDetection_Components[i] = boxDetection_Components[i + 1];
+                boxDetection_Components[i + 1] = temp;
+                Sort();
+            }
+            else if (boxDetection_Components[i].transform.position.y == boxDetection_Components[i + 1].transform.position.y)
+            {
+                if (boxDetection_Components[i].transform.position.x > boxDetection_Components[i + 1].transform.position.x)
+                {
+                    boxDetection temp = boxDetection_Components[i];
+                    boxDetection_Components[i] = boxDetection_Components[i + 1];
+                    boxDetection_Components[i + 1] = temp;
+                    Sort();
+                }
             }
         }
     }
