@@ -15,8 +15,8 @@ public class AlternateCanvasScript : MonoBehaviour
     //-----------------WIN PANEL-----------------
     [SerializeField] private GameObject winPanel;
 
-    //-----------------SORTING STUFF--------------
-    private List<boxDetection> boxDetection_Components_Sorted;
+    //-----------------OBJECTIVE TEXT--------------
+    [SerializeField] private TMP_Text objectiveNumber;
 
     private void OnEnable()
     {
@@ -34,6 +34,7 @@ public class AlternateCanvasScript : MonoBehaviour
         boxDetection_Components = FindObjectsOfType<boxDetection>();
         winPanel.SetActive(false);
         UpdateText();
+        objectiveNumber.text = GameManager.Instance.win_Total.ToString();
     }
 
     //Updates the text that shows the total value
@@ -52,7 +53,7 @@ public class AlternateCanvasScript : MonoBehaviour
         }
 
         Debug.Log(allNumbers);
-        totalText.text = allNumbers;
+        //totalText.text = allNumbers;
 
         WinCheckAndTextUpdate(allNumbers);
     }
@@ -62,12 +63,12 @@ public class AlternateCanvasScript : MonoBehaviour
         finalTotal = finalTotal.Split("=").Last();
         if (float.Parse(finalTotal) == GameManager.Instance.win_Total)
         {
-            totalText.text += "\n<color=orange>" + finalTotal + "</color><color=green><b>=" + GameManager.Instance.win_Total + "<b></color>";
+            totalText.text = "<color=orange>" + finalTotal + "</color><color=green><b>=" + GameManager.Instance.win_Total + "<b></color>";
             winPanel.SetActive(true);
         }
         else
         {
-            totalText.text += "\n<color=orange>" + finalTotal + "</color><color=red><b>≠" + GameManager.Instance.win_Total + "<b></color>";
+            totalText.text = "<color=#D97448>" + finalTotal + "</color><color=#7C0A02><b>≠" + GameManager.Instance.win_Total + "<b></color>";
         }
     }
 
