@@ -76,7 +76,8 @@ public class AlternateCanvasScript : MonoBehaviour
     {
         Debug.Log("Next Level");
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex++);
+        currentSceneIndex++;
+        SceneManager.LoadScene(currentSceneIndex);
     }
 
     private void Sort_Boxes()
