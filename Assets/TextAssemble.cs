@@ -9,25 +9,40 @@ public class TextAssemble : MonoBehaviour
     //-----------------TEXT ASSEMBLE ANIMATION-----------------
     [SerializeField] private boxDetection[] boxDetection_Components;
     [SerializeField] private Transform textAssemle_Start;
+    private GameObject[] objectCollection;
+
+    private void OnEnable()
+    {
+        objectManager.Instance.UpdateTotalText += TextAssembleAnimation;
+    }
+
+    private void OnDisable()
+    {
+        if (objectManager.Instance != null)
+            objectManager.Instance.UpdateTotalText -= TextAssembleAnimation;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         boxDetection_Components = FindObjectsOfType<boxDetection>();
-        Sort_Boxes();
+        objectCollection = new GameObject[boxDetection_Components.Length];
         TextAssembleAnimation();
     }
 
     private void TextAssembleAnimation()
     {
+        Sort_Boxes();
+        StopAllCoroutines();
+        DestroyGameObjects();
+
         float offset = 0f;
-        GameObject[] objectCollection = new GameObject[boxDetection_Components.Length];
         for (int i = 0; i < boxDetection_Components.Length; i++)
-        { 
+        {
             GameObject element = boxDetection_Components[i].gameObject;
-            GameObject newObj =new GameObject("T " + i);
-            StartCoroutine(TextAssembleMove(newObj, i/5f, element.transform, element.gameObject.GetComponentInChildren<TMP_Text>().text, new Vector3(offset,0,0)));
-            offset+=0.4f;
+            GameObject newObj = new GameObject("T " + i);
+            StartCoroutine(TextAssembleMove(newObj, i / 5f, element.transform, element.gameObject.GetComponentInChildren<TMP_Text>().text, new Vector3(offset, 0, 0)));
+            offset += 0.4f;
             objectCollection[i] = newObj;
         }
         StartCoroutine(DestroyAll(objectCollection));
@@ -49,11 +64,11 @@ public class TextAssemble : MonoBehaviour
         tex.fontSize = 0.6f;
         tex.alignment = TextAlignmentOptions.Center;
         while (true)
-        { 
+        {
             yield return new WaitForEndOfFrame();
-            if(obj == null) break;
+            if (obj == null) break;
             else
-            obj.transform.position = Vector2.Lerp(obj.transform.position, textAssemle_Start.position + addedPos, 1f * Time.deltaTime);
+                obj.transform.position = Vector2.Lerp(obj.transform.position, textAssemle_Start.position + addedPos, 1f * Time.deltaTime);
         }
         StopAllCoroutines();
     }
@@ -62,8 +77,18 @@ public class TextAssemble : MonoBehaviour
     {
         yield return new WaitForSeconds(7f);
         foreach (GameObject o in obj)
-        { 
-            Destroy(o);
+        {
+            if (o != null)
+                Destroy(o);
+        }
+    }
+
+    private void DestroyGameObjects()
+    {
+        foreach (GameObject o in objectCollection)
+        {
+            if (o != null)
+                Destroy(o);
         }
     }
 
