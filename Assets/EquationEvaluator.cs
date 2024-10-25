@@ -54,22 +54,25 @@ public static class EquationEvaluator
         {
             if (IsOperator(equationElements[i]))
             {
-                float a = float.Parse(equationElements[i - 1]);
-                float b = 0;
-                if (i + 1 < equationElements.Count)
-                    b = float.Parse(equationElements[i + 1]);
-                else
-                    return finalValue.ToString();
+                var thisOperator = equationElements[i];
+                
+                if(thisOperator is "*" or "/")
+                {
+                    
+                }
+                else if (thisOperator is "+" or "-")
+                {
+                    var nextOperator = equationElements[i + 2];
+                    if (nextOperator is "*" or "/")
+                    {
+                        
+                    }
+                    else
+                    {
+                        
+                    }
+                }
 
-                if (i + 1 < equationElements.Count)
-                {
-                    equationElements[i + 1] = Calculate(a, b, equationElements[i]).ToString();
-                    finalValue = float.Parse(equationElements[i + 1]);
-                }
-                else
-                {
-                    finalValue = Calculate(a, b, equationElements[i]);
-                }
             }
             else if (equationElements.Count == 1 && !IsOperator(equationElements[0])) // if there is only one element in the equation
             {
@@ -82,7 +85,7 @@ public static class EquationEvaluator
 
     private static bool IsOperator(string c)
     {
-        return c == "+" || c == "-" || c == "*" || c == "/";
+        return c is "+" or "-" or "*" or "/";
     }
 
     private static float Calculate(float a, float b, string op)

@@ -98,18 +98,14 @@ public class OperatorCalculatingScript : MonoBehaviour
 
             if (posY0 < posY01)
             {
-                boxDetection temp = boxDetection_Components[i];
-                boxDetection_Components[i] = boxDetection_Components[i + 1];
-                boxDetection_Components[i + 1] = temp;
+                (boxDetection_Components[i], boxDetection_Components[i + 1]) = (boxDetection_Components[i + 1], boxDetection_Components[i]);
                 Sort_Boxes();
             }
             else if (posY0 == posY01)
             {
                 if (index_0.transform.position.x > index_01.transform.position.x)
                 {
-                    boxDetection temp = boxDetection_Components[i];
-                    boxDetection_Components[i] = boxDetection_Components[i + 1];
-                    boxDetection_Components[i + 1] = temp;
+                    (boxDetection_Components[i], boxDetection_Components[i + 1]) = (boxDetection_Components[i + 1], boxDetection_Components[i]);
                     Sort_Boxes();
                 }
             }
