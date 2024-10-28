@@ -2,16 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public static class EquationEvaluator
 {
     public static string Evaluate(string equation)
     {
+        //equation = "2*9+3*6/2-4";
+        
         equation = equation.Replace("+", " + ").Replace("-", " - ").Replace("*", " * ").Replace("/", " / ");
         List<string> equationElements = equation.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-        float finalValue = 0;
+        /*float finalValue = 0;
 
         for (int i = 0; i < equationElements.Count; i++)
         {
@@ -40,7 +43,38 @@ public static class EquationEvaluator
             }
         }
 
-        return finalValue.ToString();
+        return finalValue.ToString();*/
+        while (equationElements.Count > 1)
+        {
+            // Find the index of multiplication or division operator
+            int operatorIndex = equationElements.FindIndex(x => x == "*" || x == "/");
+            
+            if (operatorIndex != -1)  // If multiplication or division exists
+            {
+                float result = Calculate(
+                    float.Parse(equationElements[operatorIndex - 1]),
+                    float.Parse(equationElements[operatorIndex + 1]),
+                    equationElements[operatorIndex]);
+                
+                // Replace the three elements (number, operator, number) with result
+                equationElements.RemoveRange(operatorIndex - 1, 3);
+                equationElements.Insert(operatorIndex - 1, result.ToString());
+            }
+            else  // Handle addition/subtraction
+            {
+                float result = Calculate(
+                    float.Parse(equationElements[0]),
+                    float.Parse(equationElements[2]),
+                    equationElements[1]);
+                
+                // Replace the first three elements with result
+                equationElements.RemoveRange(0, 3);
+                equationElements.Insert(0, result.ToString());
+            }
+        }
+        // Debug.Log(equationElements[0]);
+        return equationElements[0];
+        
     }
 
     public static string EvaluateWithDMAS(string equation)
