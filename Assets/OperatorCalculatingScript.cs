@@ -56,23 +56,23 @@ public class OperatorCalculatingScript : MonoBehaviour
             }
         }
 
+        allNumbers = allNumbers.Remove(allNumbers.Length - 1);
         Debug.Log(allNumbers);
         totalText.text = allNumbers + "=" + EquationEvaluator.Evaluate(allNumbers);
 
-        //WinCheckAndTextUpdate(allNumbers);
+        WinCheckAndTextUpdate(EquationEvaluator.Evaluate(allNumbers));
     }
 
     private void WinCheckAndTextUpdate(string finalTotal)
     {
-        finalTotal = finalTotal.Split("=").Last();
         if (float.Parse(finalTotal) == GameManager.Instance.win_Total)
         {
-            totalText.text = "<color=orange>" + finalTotal + "</color><color=green><b>=" + GameManager.Instance.win_Total + "<b></color>";
+            totalText.text += "\n<color=orange>" + finalTotal + "</color><color=green><b>=" + GameManager.Instance.win_Total + "<b></color>";
             winPanel.SetActive(true);
         }
         else
         {
-            totalText.text = "<color=#D97448>" + finalTotal + "</color><color=#7C0A02><b>≠" + GameManager.Instance.win_Total + "<b></color>";
+            totalText.text += "\n<color=#D97448>" + finalTotal + "</color><color=#7C0A02><b>≠" + GameManager.Instance.win_Total + "<b></color>";
         }
     }
 

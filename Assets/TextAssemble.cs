@@ -41,8 +41,13 @@ public class TextAssemble : MonoBehaviour
         {
             GameObject element = boxDetection_Components[i].gameObject;
             GameObject newObj = new GameObject("T " + i);
-            StartCoroutine(TextAssembleMove(newObj, i / 5f, element.transform, element.gameObject.GetComponentInChildren<TMP_Text>().text, new Vector3(offset, 0, 0)));
-            offset += 0.4f;
+            string valueStored = "";
+            foreach (TMP_Text text in element.GetComponentsInChildren<TMP_Text>())
+            {
+                valueStored += text.text;
+            }
+            StartCoroutine(TextAssembleMove(newObj, i / 5f, element.transform, valueStored, new Vector3(offset, 0, 0)));
+            offset += 0.8f;
             objectCollection[i] = newObj;
         }
         StartCoroutine(DestroyAll(objectCollection));
