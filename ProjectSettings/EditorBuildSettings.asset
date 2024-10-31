@@ -6,18 +6,27 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Type 2 Level-1.unity
-    guid: bdd830f5f959c624d89b896b64c1a9f8
+    path: Assets/Scenes/Type 3 Level-1.unity
+    guid: 4b37233aad6660642a975d69c5f53185
   - enabled: 1
-    path: Assets/Scenes/Type 2 Level-2.unity
-    guid: de7f64443e4272640bda4f97020347ae
+    path: Assets/Scenes/Type 3 Level-2.unity
+    guid: 8418d87d76098b845a7b3a87ff9cd3f3
   - enabled: 1
-    path: Assets/Scenes/Type 2 Level-3.unity
-    guid: 505042ccda55c5843ad193a12ff270cc
+    path: Assets/Scenes/Type 3 Level-3.unity
+    guid: ebc00c62ca8bd9449a44d50e67c2f85b
   - enabled: 1
-    path: Assets/Scenes/Type 2 Level-3.5.unity
-    guid: c7588f0ac72d37e47b080b179b77eaa0
+    path: Assets/Scenes/Type 3 Level-4.unity
+    guid: 05d79d367a3b9b749965274f982d47db
   - enabled: 1
-    path: Assets/Scenes/Type 2 Level-4.unity
-    guid: 1cd929f24592e044690e3538da5365af
+    path: Assets/Scenes/Type 3 Level-5.unity
+    guid: 2a9532d61d8fd4742b6323791419e53c
+  - enabled: 1
+    path: Assets/Scenes/Type 3 Level-6.unity
+    guid: 1b811dd58ebcbb84f86dc33433afd14d
+  - enabled: 1
+    path: Assets/Scenes/Type 3 Level-7.unity
+    guid: 5f56fe92e3a5721459b7f51b877c435d
+  - enabled: 1
+    path: Assets/Scenes/Type 3 Level-8.unity
+    guid: cd7d3c72762c1ff4aa85631e8107c6b1
   m_configObjects: {}

@@ -888,8 +888,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: AlternateCanvasScript, Assembly-CSharp
+      - m_Target: {fileID: 7994313201941385349}
+        m_TargetAssemblyTypeName: OperatorCalculatingScript, Assembly-CSharp
         m_MethodName: NextLevel
         m_Mode: 1
         m_Arguments:
