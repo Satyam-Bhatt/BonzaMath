@@ -56,7 +56,6 @@ public class objectManager : MonoBehaviour
                     break;
                 }
             }
-
             ResetZPosition();
         }
 

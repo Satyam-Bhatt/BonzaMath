@@ -9,8 +9,8 @@ public class boxDetection : MonoBehaviour
     private string newText;
 
     //Storing the component and string of the collided GameObject so that we can reset it later
-    [HideInInspector] public TMP_Text colliderNum = null;
-    [HideInInspector] public string collidedText = "";
+    public TMP_Text colliderNum = null;
+    public string collidedText = "";
 
     public string originalText { get; private set; }
 
@@ -42,11 +42,17 @@ public class boxDetection : MonoBehaviour
             {
                 colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
                 collidedText = colliderNum.text;
-                h.collider.gameObject.GetComponent<boxDetection>().colliderNum = myNumber;
+                //h.collider.gameObject.GetComponent<boxDetection>().colliderNum = myNumber;
 
                 newText = NumberOpertatorCombine() + colliderNum.text;
                 colliderNum.text = "";
                 myNumber.text = EquationEvaluator.Evaluate(newText);
+                break;
+            }
+            else
+            {
+                colliderNum = null;
+                collidedText = "";
             }
         }
     }
@@ -67,9 +73,10 @@ public class boxDetection : MonoBehaviour
         myNumber.text = originalText;
 
         if (colliderNum != null) { 
-            colliderNum.text = colliderNum.gameObject.GetComponentInParent<boxDetection>().originalText;
-            colliderNum.gameObject.GetComponentInParent<boxDetection>().collidedText = "";
-            colliderNum = null;
+            //colliderNum.text = colliderNum.gameObject.GetComponentInParent<boxDetection>().originalText;
+            colliderNum.text = collidedText;
+            //colliderNum.gameObject.GetComponentInParent<boxDetection>().collidedText = "";
+            //colliderNum = null;
         }
         collidedText = "";
     }
