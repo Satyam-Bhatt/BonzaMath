@@ -76,46 +76,7 @@ public static class EquationEvaluator
         return equationElements[0];
         
     }
-
-    public static string EvaluateWithDMAS(string equation)
-    {
-        equation = equation.Replace("+", " + ").Replace("-", " - ").Replace("*", " * ").Replace("/", " / ");
-        List<string> equationElements = equation.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-
-        float finalValue = 0;
-
-        for (int i = 0; i < equationElements.Count; i++)
-        {
-            if (IsOperator(equationElements[i]))
-            {
-                var thisOperator = equationElements[i];
-                
-                if(thisOperator is "*" or "/")
-                {
-                    
-                }
-                else if (thisOperator is "+" or "-")
-                {
-                    var nextOperator = equationElements[i + 2];
-                    if (nextOperator is "*" or "/")
-                    {
-                        
-                    }
-                    else
-                    {
-                        
-                    }
-                }
-
-            }
-            else if (equationElements.Count == 1 && !IsOperator(equationElements[0])) // if there is only one element in the equation
-            {
-                finalValue = float.Parse(equationElements[0]);
-            }
-        }
-
-        return finalValue.ToString();
-    }
+    
 
     private static bool IsOperator(string c)
     {

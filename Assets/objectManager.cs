@@ -31,6 +31,10 @@ public class objectManager : MonoBehaviour
     //--------------EVENT-----------------
     public event Action OnObjectReleased; //Fired when the object is released by the mouse
     public event Action UpdateTotalText; //Updates the total text
+    
+    //--------------OBJECTPOSITION-----------
+    private float _zValueForObject = -0.1f;
+
 
     // Update is called once per frame
     void Update()
@@ -93,12 +97,25 @@ public class objectManager : MonoBehaviour
     private void ResetZPosition()
     {
         GameObject[] mainObjects = GameObject.FindGameObjectsWithTag("MainObject");
-
+        int objectsStoringOtherObjects = 1;
         foreach (GameObject mO in mainObjects)
         {
-            if(mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum == null)
+            if (mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum == null)
+            {
                 mO.transform.position = new Vector3(mO.transform.position.x, mO.transform.position.y, 0);
+            }
+            else if(mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum != null)
+            {
+                objectsStoringOtherObjects++;
+            }
         }
+
+        _zValueForObject = objectsStoringOtherObjects switch
+        {
+            1 => -0.1f,
+            > 1 => -0.1f * objectsStoringOtherObjects,
+            _ => _zValueForObject
+        };
     }
 
     private void RotateLeft(GameObject gameObj)
@@ -139,11 +156,11 @@ public class objectManager : MonoBehaviour
     {
         float posX = Mathf.Round(gameObj.transform.position.x);
         float posY = Mathf.Round(gameObj.transform.position.y);
-        gameObj.transform.position = new Vector3(posX, posY, -0.1f);
+        gameObj.transform.position = new Vector3(posX, posY, _zValueForObject);
     }
 
     private void AttachToMouse(GameObject gameObj)
     {
-        gameObj.transform.position = new Vector3(mousePosition_.x, mousePosition_.y, -0.1f);
+        gameObj.transform.position = new Vector3(mousePosition_.x, mousePosition_.y, _zValueForObject);
     }
 }
