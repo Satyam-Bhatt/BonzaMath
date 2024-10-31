@@ -7,12 +7,15 @@ public class boxDetection : MonoBehaviour
 {
     private TMP_Text myNumber;
     private string newText;
+    public string originalText { get; private set; }
 
     //Storing the component and string of the collided GameObject so that we can reset it later
     public TMP_Text colliderNum = null;
     public string collidedText = "";
 
-    public string originalText { get; private set; }
+    //Checking if the box is in the bounding box or not
+    [field: SerializeField] public bool IsInBoundingBox { get; private set; } = false; 
+
 
 
     private void Awake()
@@ -29,8 +32,9 @@ public class boxDetection : MonoBehaviour
     private void Start()
     {
         originalText = myNumber.text;
+        IsInBoundingBox = BoundingBoxCheckRay();
     }
-
+    
     public void ShootRay()
     {
         Ray ray = new Ray(transform.position, transform.forward);
@@ -42,7 +46,6 @@ public class boxDetection : MonoBehaviour
             {
                 colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
                 collidedText = colliderNum.text;
-                //h.collider.gameObject.GetComponent<boxDetection>().colliderNum = myNumber;
 
                 newText = NumberOpertatorCombine() + colliderNum.text;
                 colliderNum.text = "";
@@ -55,6 +58,7 @@ public class boxDetection : MonoBehaviour
                 collidedText = "";
             }
         }
+        IsInBoundingBox = BoundingBoxCheckRay();
     }
 
     public void Subscribe()
@@ -73,13 +77,28 @@ public class boxDetection : MonoBehaviour
         myNumber.text = originalText;
 
         if (colliderNum != null) { 
-            //colliderNum.text = colliderNum.gameObject.GetComponentInParent<boxDetection>().originalText;
             colliderNum.text = collidedText;
-            //colliderNum.gameObject.GetComponentInParent<boxDetection>().collidedText = "";
-            //colliderNum = null;
         }
         collidedText = "";
     }
+    
+    private bool BoundingBoxCheckRay()
+    {
+        Ray ray = new Ray(transform.position, transform.forward);
+        RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction);
+        bool foundBoundingBox = false;
+        foreach (RaycastHit2D h in hit)
+        {
+            if (h.collider != null && h.collider.tag == "BoundingBox")
+            {
+                foundBoundingBox = true;
+            }
+            else foundBoundingBox = false;
+        }
+        
+        return foundBoundingBox;
+    }
+
 
     //Gets the two text fields one containg the number and the other containing the operator and combines them
     private string NumberOpertatorCombine()

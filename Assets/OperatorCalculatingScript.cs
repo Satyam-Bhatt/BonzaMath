@@ -46,7 +46,7 @@ public class OperatorCalculatingScript : MonoBehaviour
 
         for (int i = 0; i < boxDetection_Components.Length; i++)
         {
-            if (boxDetection_Components[i].GetComponentInChildren<TMP_Text>().text != "")
+            if (boxDetection_Components[i].IsInBoundingBox && boxDetection_Components[i].GetComponentInChildren<TMP_Text>().text != "")
             {
                 TMP_Text[] textComponents = boxDetection_Components[i].GetComponentsInChildren<TMP_Text>();
                 foreach (TMP_Text t in textComponents)

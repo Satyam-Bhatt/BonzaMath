@@ -7,6 +7,7 @@ TagManager:
   - ObjectCanvas
   - MainObject
   - ChildObject
+  - BoundingBox
   layers:
   - Default
   - TransparentFX
@@ -43,4 +44,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Boxes
+    uniqueID: 2679728091
+    locked: 0
+  - name: Boxes_UI
+    uniqueID: 4210971045
     locked: 0
