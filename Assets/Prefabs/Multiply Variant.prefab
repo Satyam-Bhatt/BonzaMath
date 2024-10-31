@@ -38,7 +38,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1187804411765818587, guid: 76fa0786a3e087840957eafd6403eec5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1187804411765818587, guid: 76fa0786a3e087840957eafd6403eec5, type: 3}
       propertyPath: m_LocalPosition.z
@@ -82,7 +82,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7367544123221050873, guid: 76fa0786a3e087840957eafd6403eec5, type: 3}
       propertyPath: m_Name
-      value: Subtraction Variant (1) Variant
+      value: Multiply Variant
       objectReference: {fileID: 0}
     - target: {fileID: 7785792487375600943, guid: 76fa0786a3e087840957eafd6403eec5, type: 3}
       propertyPath: m_text
