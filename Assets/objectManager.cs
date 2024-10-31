@@ -96,7 +96,8 @@ public class objectManager : MonoBehaviour
 
         foreach (GameObject mO in mainObjects)
         {
-            mO.transform.position = new Vector3(mO.transform.position.x, mO.transform.position.y, 0);
+            if(mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum == null)
+                mO.transform.position = new Vector3(mO.transform.position.x, mO.transform.position.y, 0);
         }
     }
 
