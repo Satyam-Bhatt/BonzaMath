@@ -32,7 +32,7 @@ public class objectManager : MonoBehaviour
     public event Action OnObjectReleased; //Fired when the object is released by the mouse
     public event Action UpdateTotalText; //Updates the total text
     
-    //--------------OBJECTPOSITION-----------
+    //--------------OBJECT POSITION-----------
     private float _zValueForObject = -0.1f;
 
 
