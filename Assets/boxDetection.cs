@@ -13,11 +13,9 @@ public class boxDetection : MonoBehaviour
     public TMP_Text colliderNum = null;
     public string collidedText = "";
 
-    //Checking if the box is in the bounding box or not
+    //BoundingBox
     [field: SerializeField] public bool IsInBoundingBox { get; private set; } = false; 
-
-
-
+    [SerializeField]  private BoundingBox _boundingBox = null;
     private void Awake()
     {
         myNumber = GetComponentInChildren<TMP_Text>();
@@ -64,6 +62,7 @@ public class boxDetection : MonoBehaviour
     public void Subscribe()
     {
         objectManager.Instance.OnObjectReleased += ShootRay;
+        _boundingBox = null;
     }
 
     public void Unsubscribe()
@@ -92,6 +91,8 @@ public class boxDetection : MonoBehaviour
             if (h.collider != null && h.collider.tag == "BoundingBox")
             {
                 foundBoundingBox = true;
+                _boundingBox = h.collider.gameObject.GetComponent<BoundingBox>();
+                _boundingBox.Fill(true);
             }
             else foundBoundingBox = false;
         }
