@@ -96,33 +96,37 @@ public class objectManager : MonoBehaviour
         }
     }
 
+    private BoundingBox _boxToHighlight = null;
     //Checks the distance and then highlights the box
+    //TODO: Take the objects inside the GameObject o
     private void BoundingBoxHighlight(GameObject o)
     {
-        BoundingBox boundingBoxToHighlight = null;
-        foreach (var vBox in boundingBoxes)
+        if (_boxToHighlight)
         {
-            BoundingBox boundingBox = vBox.GetComponent<BoundingBox>();
-            if (!boundingBox.IsFilled)
-            {
-                var minDist = 100f;
-                var distBetweenBoxAndObject = Vector2.Distance(o.transform.position, boundingBox.transform.position);
-                if (distBetweenBoxAndObject < minDist && distBetweenBoxAndObject < 0.75f)
-                {
-                    boundingBoxToHighlight = boundingBox;
-                    minDist = distBetweenBoxAndObject;
-                }
-            }
-        }
-
-        if (boundingBoxToHighlight)
-        {
-            boundingBoxToHighlight.ChangeColor(Color.yellow);
+            _boxToHighlight.ChangeColor(Color.yellow);
             
-            var distBetweenBoxAndObject2 = Vector2.Distance(o.transform.position, boundingBoxToHighlight.transform.position);
+            var distBetweenBoxAndObject2 = Vector2.Distance(o.transform.position, _boxToHighlight.transform.position);
             if (distBetweenBoxAndObject2 > 0.75f)
             {
-                boundingBoxToHighlight.ChangeColor(Color.white);
+                _boxToHighlight.ChangeColor(Color.white);
+                _boxToHighlight = null;
+            }
+        }
+        else
+        {
+            foreach (var vBox in boundingBoxes)
+            {
+                BoundingBox boundingBox = vBox.GetComponent<BoundingBox>();
+                if (!boundingBox.IsFilled)
+                {
+                    var minDist = 100f;
+                    var distBetweenBoxAndObject = Vector2.Distance(o.transform.position, boundingBox.transform.position);
+                    if (distBetweenBoxAndObject < minDist && distBetweenBoxAndObject < 0.75f)
+                    {
+                        _boxToHighlight = boundingBox;
+                        minDist = distBetweenBoxAndObject;
+                    }
+                }
             }
         }
         
