@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class BoundingBox : MonoBehaviour
 {
-    [SerializeField] private bool isFilled = false;
+    [field:SerializeField] public bool IsFilled { get; private set; }  = false;
 
     public void Fill( bool state)
     {
-        isFilled = state;
+        IsFilled = state;
+    }
+
+    public void ChangeColor(Color color)
+    {
+        GetComponent<SpriteRenderer>().color = color;
     }
 }

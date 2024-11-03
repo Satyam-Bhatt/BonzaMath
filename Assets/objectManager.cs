@@ -34,7 +34,9 @@ public class objectManager : MonoBehaviour
     
     //--------------OBJECT POSITION-----------
     private float _zValueForObject = -0.1f;
-
+    
+    //-------------BOUNDING BOX---------------
+    [SerializeField] private GameObject[] boundingBoxes;
 
     // Update is called once per frame
     void Update()
@@ -66,6 +68,7 @@ public class objectManager : MonoBehaviour
         if (Input.GetKey(KeyCode.Mouse0) && hitObject != null)
         {
             AttachToMouse(hitObject);
+            BoundingBoxHighlight(hitObject);
 
             if (Input.GetKeyDown(KeyCode.E))
             {
@@ -91,6 +94,38 @@ public class objectManager : MonoBehaviour
 
             UpdateTotalText?.Invoke();
         }
+    }
+
+    //Checks the distance and then highlights the box
+    private void BoundingBoxHighlight(GameObject o)
+    {
+        BoundingBox boundingBoxToHighlight = null;
+        foreach (var vBox in boundingBoxes)
+        {
+            BoundingBox boundingBox = vBox.GetComponent<BoundingBox>();
+            if (!boundingBox.IsFilled)
+            {
+                var minDist = 100f;
+                var distBetweenBoxAndObject = Vector2.Distance(o.transform.position, boundingBox.transform.position);
+                if (distBetweenBoxAndObject < minDist && distBetweenBoxAndObject < 0.75f)
+                {
+                    boundingBoxToHighlight = boundingBox;
+                    minDist = distBetweenBoxAndObject;
+                }
+            }
+        }
+
+        if (boundingBoxToHighlight)
+        {
+            boundingBoxToHighlight.ChangeColor(Color.yellow);
+            
+            var distBetweenBoxAndObject2 = Vector2.Distance(o.transform.position, boundingBoxToHighlight.transform.position);
+            if (distBetweenBoxAndObject2 > 0.75f)
+            {
+                boundingBoxToHighlight.ChangeColor(Color.white);
+            }
+        }
+        
     }
 
     //Resets all the main objects to 0 on Z axis
