@@ -7,11 +7,11 @@ using TMPro;
 public class objectManager : MonoBehaviour
 {
     private static objectManager _instance;
+
     public static objectManager Instance
     {
         get
         {
-
             _instance = FindObjectOfType<objectManager>();
             if (_instance == null)
             {
@@ -31,10 +31,10 @@ public class objectManager : MonoBehaviour
     //--------------EVENT-----------------
     public event Action OnObjectReleased; //Fired when the object is released by the mouse
     public event Action UpdateTotalText; //Updates the total text
-    
+
     //--------------OBJECT POSITION-----------
     private float _zValueForObject = -0.1f;
-    
+
     //-------------BOUNDING BOX---------------
     [SerializeField] private GameObject[] boundingBoxes;
 
@@ -62,6 +62,7 @@ public class objectManager : MonoBehaviour
                     break;
                 }
             }
+
             ResetZPosition();
         }
 
@@ -90,6 +91,7 @@ public class objectManager : MonoBehaviour
                 bD.Unsubscribe();
                 //bD.enabled = false;
             }
+
             hitObject = null;
 
             UpdateTotalText?.Invoke();
@@ -97,14 +99,37 @@ public class objectManager : MonoBehaviour
     }
 
     private BoundingBox _boxToHighlight = null;
+
+    private List<BoundingBox> _boxesToHighlight = new List<BoundingBox>();
+
     //Checks the distance and then highlights the box
     //TODO: Take the objects inside the GameObject o
     private void BoundingBoxHighlight(GameObject o)
     {
+        for (int i = 0; i < o.transform.childCount; i++)
+        {
+            Transform child = o.transform.GetChild(i);
+            foreach (var vBox in boundingBoxes)
+            {
+                BoundingBox boundingBox = vBox.GetComponent<BoundingBox>();
+                if (!boundingBox.IsFilled)
+                {
+                    var minDist = 100f;
+                    var distBetweenBoxAndObject = Vector2.Distance(child.position, boundingBox.transform.position);
+                    if (distBetweenBoxAndObject < minDist && distBetweenBoxAndObject < 0.75f)
+                    {
+                        _boxToHighlight = boundingBox;
+                        minDist = distBetweenBoxAndObject;
+                    }
+                }
+            }
+            _boxesToHighlight.Add(_boxToHighlight);
+        }
+
         if (_boxToHighlight)
         {
             _boxToHighlight.ChangeColor(Color.yellow);
-            
+
             var distBetweenBoxAndObject2 = Vector2.Distance(o.transform.position, _boxToHighlight.transform.position);
             if (distBetweenBoxAndObject2 > 0.75f)
             {
@@ -129,77 +154,74 @@ public class objectManager : MonoBehaviour
                 }
             }
         }
-        
     }
 
     //Resets all the main objects to 0 on Z axis
-    private void ResetZPosition()
-    {
-        GameObject[] mainObjects = GameObject.FindGameObjectsWithTag("MainObject");
-        int objectsStoringOtherObjects = 1;
-        foreach (GameObject mO in mainObjects)
+        private void ResetZPosition()
         {
-            if (mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum == null)
+            GameObject[] mainObjects = GameObject.FindGameObjectsWithTag("MainObject");
+            int objectsStoringOtherObjects = 1;
+            foreach (GameObject mO in mainObjects)
             {
-                mO.transform.position = new Vector3(mO.transform.position.x, mO.transform.position.y, 0);
+                if (mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum == null)
+                {
+                    mO.transform.position = new Vector3(mO.transform.position.x, mO.transform.position.y, 0);
+                }
+                else if (mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum != null)
+                {
+                    objectsStoringOtherObjects++;
+                }
             }
-            else if(mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum != null)
+
+            _zValueForObject = objectsStoringOtherObjects switch
             {
-                objectsStoringOtherObjects++;
+                1 => -0.1f,
+                > 1 => -0.1f * objectsStoringOtherObjects,
+                _ => _zValueForObject
+            };
+        }
+
+        private void RotateLeft(GameObject gameObj)
+        {
+            float rotationAngle = gameObj.transform.rotation.eulerAngles.z - 90;
+            gameObj.transform.rotation = Quaternion.AngleAxis(rotationAngle, Vector3.forward);
+
+            //Rotates the canvas in opposite direction
+            Canvas[] canvases = gameObj.transform.GetComponentsInChildren<Canvas>();
+            foreach (Canvas canvas in canvases)
+            {
+                if (canvas.gameObject.CompareTag("ObjectCanvas"))
+                {
+                    canvas.gameObject.transform.rotation = Quaternion.Inverse(gameObj.transform.rotation) * gameObj.transform.rotation;
+                }
             }
         }
 
-        _zValueForObject = objectsStoringOtherObjects switch
+        private void RotateRight(GameObject gameObj)
         {
-            1 => -0.1f,
-            > 1 => -0.1f * objectsStoringOtherObjects,
-            _ => _zValueForObject
-        };
-    }
+            float rotationAngle = gameObj.transform.rotation.eulerAngles.z + 90;
+            gameObj.transform.rotation = Quaternion.AngleAxis(rotationAngle, Vector3.forward);
 
-    private void RotateLeft(GameObject gameObj)
-    {
-        float rotationAngle = gameObj.transform.rotation.eulerAngles.z - 90;
-        gameObj.transform.rotation = Quaternion.AngleAxis(rotationAngle, Vector3.forward);
-
-        //Rotates the canvas in opposite direction
-        Canvas[] canvases = gameObj.transform.GetComponentsInChildren<Canvas>();
-        foreach (Canvas canvas in canvases)
-        {
-            if (canvas.gameObject.CompareTag("ObjectCanvas"))
+            //Rotates the canvas in opposite direction
+            Canvas[] canvases = gameObj.transform.GetComponentsInChildren<Canvas>();
+            foreach (Canvas canvas in canvases)
             {
-                canvas.gameObject.transform.rotation = Quaternion.Inverse(gameObj.transform.rotation) * gameObj.transform.rotation;
+                if (canvas.gameObject.CompareTag("ObjectCanvas"))
+                {
+                    canvas.gameObject.transform.rotation = Quaternion.Inverse(gameObj.transform.rotation) * gameObj.transform.rotation;
+                }
             }
         }
 
-    }
-
-    private void RotateRight(GameObject gameObj)
-    {
-        float rotationAngle = gameObj.transform.rotation.eulerAngles.z + 90;
-        gameObj.transform.rotation = Quaternion.AngleAxis(rotationAngle, Vector3.forward);
-
-        //Rotates the canvas in opposite direction
-        Canvas[] canvases = gameObj.transform.GetComponentsInChildren<Canvas>();
-        foreach (Canvas canvas in canvases)
+        private void DetachFromMouse(GameObject gameObj)
         {
-            if (canvas.gameObject.CompareTag("ObjectCanvas"))
-            {
-                canvas.gameObject.transform.rotation = Quaternion.Inverse(gameObj.transform.rotation) * gameObj.transform.rotation;
-            }
+            float posX = Mathf.Round(gameObj.transform.position.x);
+            float posY = Mathf.Round(gameObj.transform.position.y);
+            gameObj.transform.position = new Vector3(posX, posY, _zValueForObject);
         }
 
+        private void AttachToMouse(GameObject gameObj)
+        {
+            gameObj.transform.position = new Vector3(mousePosition_.x, mousePosition_.y, _zValueForObject);
+        }
     }
-
-    private void DetachFromMouse(GameObject gameObj)
-    {
-        float posX = Mathf.Round(gameObj.transform.position.x);
-        float posY = Mathf.Round(gameObj.transform.position.y);
-        gameObj.transform.position = new Vector3(posX, posY, _zValueForObject);
-    }
-
-    private void AttachToMouse(GameObject gameObj)
-    {
-        gameObj.transform.position = new Vector3(mousePosition_.x, mousePosition_.y, _zValueForObject);
-    }
-}
