@@ -37,6 +37,9 @@ public class objectManager : MonoBehaviour
 
     //-------------BOUNDING BOX---------------
     [SerializeField] private GameObject[] boundingBoxes;
+    [SerializeField] private List<BoundingBoxWithTile> _boxesToHighlight = new List<BoundingBoxWithTile>();
+    private BoundingBox _boxToHighlight = null;
+    private Transform _relaventTile = null;
 
     // Update is called once per frame
     void Update()
@@ -98,12 +101,8 @@ public class objectManager : MonoBehaviour
         }
     }
 
-    private BoundingBox _boxToHighlight = null;
-    private Transform _relaventTile = null;
-    [SerializeField] private List<BoundingBoxWithTile> _boxesToHighlight = new List<BoundingBoxWithTile>();
-
     //Checks the distance and then highlights the box
-    //TODO: Take the objects inside the GameObject o
+    //TODO: The merge is not working properly. The bounding box remains yellow. 
     private void BoundingBoxHighlight(GameObject o)
     {
         if (_boxesToHighlight.Count == o.transform.childCount)
@@ -122,6 +121,7 @@ public class objectManager : MonoBehaviour
                     foreach (BoundingBoxWithTile box2 in _boxesToHighlight)
                     {
                         box2.boundingBox.ChangeColor(Color.white);
+                        box2.boundingBox.Fill(false);
                     }
                     _boxToHighlight = null;
                     _relaventTile = null;
@@ -165,36 +165,6 @@ public class objectManager : MonoBehaviour
             }
             
         }
-        
-
-        /*if (_boxToHighlight)
-        {
-            _boxToHighlight.ChangeColor(Color.yellow);
-
-            var distBetweenBoxAndObject2 = Vector2.Distance(o.transform.position, _boxToHighlight.transform.position);
-            if (distBetweenBoxAndObject2 > 0.75f)
-            {
-                _boxToHighlight.ChangeColor(Color.white);
-                _boxToHighlight = null;
-            }
-        }
-        else
-        {
-            foreach (var vBox in boundingBoxes)
-            {
-                BoundingBox boundingBox = vBox.GetComponent<BoundingBox>();
-                if (!boundingBox.IsFilled)
-                {
-                    var minDist = 100f;
-                    var distBetweenBoxAndObject = Vector2.Distance(o.transform.position, boundingBox.transform.position);
-                    if (distBetweenBoxAndObject < minDist && distBetweenBoxAndObject < 0.75f)
-                    {
-                        _boxToHighlight = boundingBox;
-                        minDist = distBetweenBoxAndObject;
-                    }
-                }
-            }
-        }*/
     }
 
     //Resets all the main objects to 0 on Z axis

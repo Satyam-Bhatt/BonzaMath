@@ -33,12 +33,12 @@ public class OperatorCalculatingScript : MonoBehaviour
     {
         boxDetection_Components = FindObjectsOfType<boxDetection>();
         winPanel.SetActive(false);
-        UpdateText();
         objectiveNumber.text = GameManager.Instance.win_Total.ToString();
+        StartCoroutine(DelayedUpdate());
     }
 
     //Updates the text that shows the total value
-    public void UpdateText()
+    private void UpdateText()
     {
         Sort_Boxes();
 
@@ -55,8 +55,9 @@ public class OperatorCalculatingScript : MonoBehaviour
                 }
             }
         }
-
+        
         allNumbers = allNumbers.Remove(allNumbers.Length - 1);
+        
         Debug.Log(allNumbers);
         totalText.text = allNumbers + "=" + EquationEvaluator.Evaluate(allNumbers);
 
@@ -110,6 +111,13 @@ public class OperatorCalculatingScript : MonoBehaviour
                 }
             }
         }
+    }
+    
+    //Updates the text on top but after some small delay. This is done so that that boxes are added
+    private IEnumerator DelayedUpdate()
+    {
+        yield return new WaitForSeconds(0.2f);
+        UpdateText();
     }
 }
 
