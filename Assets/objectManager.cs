@@ -31,13 +31,14 @@ public class objectManager : MonoBehaviour
     //--------------EVENT-----------------
     public event Action OnObjectReleased; //Fired when the object is released by the mouse
     public event Action UpdateTotalText; //Updates the total text
+    public event Action<GameObject> SendHitObject; //SendsOutHitObject
 
     //--------------OBJECT POSITION-----------
     private float _zValueForObject = -0.1f;
 
     //-------------BOUNDING BOX---------------
     [SerializeField] private GameObject[] boundingBoxes;
-    [SerializeField] private List<BoundingBoxWithTile> _boxesToHighlight = new List<BoundingBoxWithTile>();
+    public List<BoundingBoxWithTile> _boxesToHighlight = new List<BoundingBoxWithTile>();
     private BoundingBox _boxToHighlight = null;
     private Transform _relaventTile = null;
 
@@ -65,7 +66,8 @@ public class objectManager : MonoBehaviour
                     break;
                 }
             }
-
+            
+            SendHitObject?.Invoke(hitObject);
             ResetZPosition();
         }
 
@@ -95,14 +97,25 @@ public class objectManager : MonoBehaviour
                 //bD.enabled = false;
             }
 
-            hitObject = null;
-
             UpdateTotalText?.Invoke();
+
+            if (_boxesToHighlight.Count > 0)
+            {
+                foreach (BoundingBoxWithTile b in _boxesToHighlight)
+                {
+                    b.boundingBox._boxToHighlight = new List<BoundingBoxWithTile>(_boxesToHighlight);
+                    b.boundingBox.storedObject = hitObject;
+                }
+            }
+            _boxesToHighlight.Clear();
+            
+            hitObject = null;
         }
     }
 
     //Checks the distance and then highlights the box
-    //TODO: The merge is not working properly. The bounding box remains yellow. 
+    //TODO: Naming convention is wrong + no comments added and the stored list in BoundingBox is not resetted
+    //TODO: The merge is not working properly. The bounding box colors are inappropriate. 
     private void BoundingBoxHighlight(GameObject o)
     {
         if (_boxesToHighlight.Count == o.transform.childCount)
