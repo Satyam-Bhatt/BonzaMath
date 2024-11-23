@@ -104,7 +104,8 @@ public class objectManager : MonoBehaviour
                 foreach (BoundingBoxWithTile b in _boxesToHighlight)
                 {
                     b.boundingBox._boxToHighlight = new List<BoundingBoxWithTile>(_boxesToHighlight);
-                    b.boundingBox.storedObject = hitObject;
+                    b.boundingBox.storedObject.Add(hitObject);
+                    b.boundingBox.ChangeColor(Color.black);
                 }
             }
             _boxesToHighlight.Clear();
@@ -133,7 +134,8 @@ public class objectManager : MonoBehaviour
                 {
                     foreach (BoundingBoxWithTile box2 in _boxesToHighlight)
                     {
-                        box2.boundingBox.ChangeColor(Color.white);
+                        //box2.boundingBox.ChangeColor(Color.white);
+                        box2.boundingBox.ColorChange();
                         box2.boundingBox.Fill(false);
                     }
                     _boxToHighlight = null;

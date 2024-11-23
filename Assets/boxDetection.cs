@@ -92,7 +92,7 @@ public class boxDetection : MonoBehaviour
             {
                 foundBoundingBox = true;
                 _boundingBox = h.collider.gameObject.GetComponent<BoundingBox>();
-                _boundingBox.Fill(true);
+                //_boundingBox.Fill(true);
                 break;
             }
         }
