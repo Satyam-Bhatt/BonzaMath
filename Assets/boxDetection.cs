@@ -10,12 +10,16 @@ public class boxDetection : MonoBehaviour
     public string originalText { get; private set; }
 
     //Storing the component and string of the collided GameObject so that we can reset it later
+    [field: Space(10)]
+    [field: Header("Number Merge")]
     public TMP_Text colliderNum = null;
     public string collidedText = "";
 
-    //BoundingBox
+    //BoundingBox fields storing the status and the bounding box
+    [field: Space(10)]
+    [field: Header("Bounding Box")]
     [field: SerializeField] public bool IsInBoundingBox { get; private set; } = false; 
-    [SerializeField]  private BoundingBox _boundingBox = null;
+    public BoundingBox _boundingBox = null;
     private void Awake()
     {
         myNumber = GetComponentInChildren<TMP_Text>();
@@ -62,7 +66,6 @@ public class boxDetection : MonoBehaviour
     public void Subscribe()
     {
         objectManager.Instance.OnObjectReleased += ShootRay;
-        _boundingBox = null;
     }
 
     public void Unsubscribe()
@@ -92,8 +95,12 @@ public class boxDetection : MonoBehaviour
             {
                 foundBoundingBox = true;
                 _boundingBox = h.collider.gameObject.GetComponent<BoundingBox>();
-                //_boundingBox.Fill(true);
                 break;
+            }
+            else
+            {
+                foundBoundingBox = false;
+                _boundingBox = null;
             }
         }
         

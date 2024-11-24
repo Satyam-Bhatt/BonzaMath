@@ -5,10 +5,9 @@ using UnityEngine;
 
 public class BoundingBox : MonoBehaviour
 {
-    [field: SerializeField] public bool IsFilled { get; private set; } = false;
+    [field: SerializeField] public bool CanBeFilled { get; private set; } = false;
 
-    public List<BoundingBoxWithTile> _boxToHighlight = null;
-    public List<GameObject> storedObject = null;
+    public List<GameObject> storedObject = null; //The Objects present in the Bounding Box
 
     private void OnEnable()
     {
@@ -27,7 +26,7 @@ public class BoundingBox : MonoBehaviour
 
     public void Fill(bool state)
     {
-        IsFilled = state;
+        CanBeFilled = state;
     }
 
     public void ChangeColor(Color color)
@@ -41,13 +40,7 @@ public class BoundingBox : MonoBehaviour
         {
             if (gO == o)
             {
-                if (_boxToHighlight.Count > 0)
-                {
-                    objectManager.Instance._boxesToHighlight = new List<BoundingBoxWithTile>(_boxToHighlight);
-                    _boxToHighlight.Clear();
-                    storedObject.Remove(o);
-                }
-
+                storedObject.Remove(o);
                 break;
             }
         }
@@ -67,13 +60,6 @@ public class BoundingBox : MonoBehaviour
 
     public void ColorChange()
     {
-        if (storedObject.Count > 0)
-        {
-            ChangeColor(Color.black);
-        }
-        else
-        {
-            ChangeColor(Color.white);
-        }
+        ChangeColor(storedObject.Count > 0 ? Color.black : Color.white);
     }
 }

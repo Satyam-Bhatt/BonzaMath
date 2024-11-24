@@ -31,14 +31,14 @@ public class objectManager : MonoBehaviour
     //--------------EVENT-----------------
     public event Action OnObjectReleased; //Fired when the object is released by the mouse
     public event Action UpdateTotalText; //Updates the total text
-    public event Action<GameObject> SendHitObject; //SendsOutHitObject
+    public event Action<GameObject> SendHitObject; //Sends Out HitObject when mouse is clicked and HitObject != null
 
     //--------------OBJECT POSITION-----------
     private float _zValueForObject = -0.1f;
 
     //-------------BOUNDING BOX---------------
     [SerializeField] private GameObject[] boundingBoxes;
-    public List<BoundingBoxWithTile> _boxesToHighlight = new List<BoundingBoxWithTile>();
+    public List<BoundingBoxWithTile> boxesToHighlight = new List<BoundingBoxWithTile>();
     private BoundingBox _boxToHighlight = null;
     private Transform _relaventTile = null;
 
@@ -66,8 +66,25 @@ public class objectManager : MonoBehaviour
                     break;
                 }
             }
-            
+
             SendHitObject?.Invoke(hitObject);
+
+            #region Populate the list of BoundingBox
+
+            for (int i = 0; i < hitObject.transform.childCount; i++)
+            {
+                Transform childTransform = hitObject.transform.GetChild(i);
+                BoundingBox childStoredBoundinBox = hitObject.transform.GetChild(i).GetComponent<boxDetection>()._boundingBox;
+                if (childStoredBoundinBox != null)
+                {
+                    BoundingBoxWithTile childStoredBoundinBoxWithTile = new BoundingBoxWithTile(childStoredBoundinBox, childTransform);
+                    boxesToHighlight.Add(childStoredBoundinBoxWithTile);
+                }
+            }
+
+            #endregion
+
+
             ResetZPosition();
         }
 
@@ -88,63 +105,63 @@ public class objectManager : MonoBehaviour
         else if (Input.GetKeyUp(KeyCode.Mouse0) && hitObject != null)
         {
             DetachFromMouse(hitObject);
-            OnObjectReleased?.Invoke(); // Shoots a ray from the cubes
+            OnObjectReleased?.Invoke(); // Shoots a ray from the cubes and checks if the cell occupies any bounding boxes
 
             boxDetection[] boxDetections = hitObject.GetComponentsInChildren<boxDetection>();
             foreach (boxDetection bD in boxDetections)
             {
                 bD.Unsubscribe();
-                //bD.enabled = false;
             }
 
             UpdateTotalText?.Invoke();
 
-            if (_boxesToHighlight.Count > 0)
+            //Adds the Hit Object to the corresponding bounding boxes.
+            if (boxesToHighlight.Count > 0)
             {
-                foreach (BoundingBoxWithTile b in _boxesToHighlight)
+                foreach (BoundingBoxWithTile b in boxesToHighlight)
                 {
-                    b.boundingBox._boxToHighlight = new List<BoundingBoxWithTile>(_boxesToHighlight);
                     b.boundingBox.storedObject.Add(hitObject);
-                    b.boundingBox.ChangeColor(Color.black);
+                    b.boundingBox.ChangeColor(Color.black); //Color when the cell is occupied
                 }
             }
-            _boxesToHighlight.Clear();
-            
+
+            boxesToHighlight.Clear();
+
             hitObject = null;
         }
     }
 
     //Checks the distance and then highlights the box
-    //TODO: Naming convention is wrong + no comments added and the stored list in BoundingBox is not resetted
-    //TODO: The merge is not working properly. The bounding box colors are inappropriate. 
     private void BoundingBoxHighlight(GameObject o)
     {
-        if (_boxesToHighlight.Count == o.transform.childCount)
+        //When the hit object finds the bounding box just loop through the bounding boxes found by the hit object
+        if (boxesToHighlight.Count == o.transform.childCount)
         {
-            foreach (BoundingBoxWithTile box in _boxesToHighlight)
+            foreach (BoundingBoxWithTile box in boxesToHighlight)
             {
                 box.boundingBox.ChangeColor(Color.yellow);
             }
-            
+
             //Distance Check
-            foreach (BoundingBoxWithTile box in _boxesToHighlight)
+            foreach (BoundingBoxWithTile box in boxesToHighlight)
             {
                 float dist = Vector2.Distance(box.boundingBox.transform.position, box.tileTransform.position);
                 if (dist > 0.75f)
                 {
-                    foreach (BoundingBoxWithTile box2 in _boxesToHighlight)
+                    foreach (BoundingBoxWithTile box2 in boxesToHighlight)
                     {
-                        //box2.boundingBox.ChangeColor(Color.white);
                         box2.boundingBox.ColorChange();
                         box2.boundingBox.Fill(false);
                     }
+
                     _boxToHighlight = null;
                     _relaventTile = null;
-                    _boxesToHighlight.Clear();
+                    boxesToHighlight.Clear();
                     return;
                 }
             }
         }
+        //When the hit object doesn't find the bounding box just loop through all the bounding boxes present
         else
         {
             for (int i = 0; i < o.transform.childCount; i++)
@@ -153,7 +170,7 @@ public class objectManager : MonoBehaviour
                 foreach (var vBox in boundingBoxes)
                 {
                     BoundingBox boundingBox = vBox.GetComponent<BoundingBox>();
-                    if (!boundingBox.IsFilled)
+                    if (!boundingBox.CanBeFilled)
                     {
                         var minDist = 100f;
                         var distBetweenBoxAndObject = Vector2.Distance(child.position, boundingBox.transform.position);
@@ -165,20 +182,18 @@ public class objectManager : MonoBehaviour
                         }
                     }
                 }
-                
+
                 if (!_boxToHighlight)
                 {
-                    _boxesToHighlight.Clear();
+                    boxesToHighlight.Clear();
                     return;
                 }
-            
+
                 BoundingBoxWithTile box = new BoundingBoxWithTile(_boxToHighlight, _relaventTile);
-                _boxesToHighlight.Add(box);
+                boxesToHighlight.Add(box);
                 _boxToHighlight = null;
                 _relaventTile = null;
-            
             }
-            
         }
     }
 
@@ -256,11 +271,11 @@ public class objectManager : MonoBehaviour
 public class BoundingBoxWithTile
 {
     public BoundingBox boundingBox;
-    public Transform tileTransform;  
+    public Transform tileTransform;
+
     public BoundingBoxWithTile(BoundingBox boundingBox_, Transform tileTransform_)
     {
         boundingBox = boundingBox_;
         tileTransform = tileTransform_;
     }
-
 }

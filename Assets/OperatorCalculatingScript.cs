@@ -58,7 +58,7 @@ public class OperatorCalculatingScript : MonoBehaviour
         
         allNumbers = allNumbers.Remove(allNumbers.Length - 1);
         
-        Debug.Log(allNumbers);
+        //Debug.Log(allNumbers);
         totalText.text = allNumbers + "=" + EquationEvaluator.Evaluate(allNumbers);
 
         WinCheckAndTextUpdate(EquationEvaluator.Evaluate(allNumbers));
