@@ -20,6 +20,10 @@ public class boxDetection : MonoBehaviour
     [field: Header("Bounding Box")]
     [field: SerializeField] public bool IsInBoundingBox { get; private set; } = false; 
     public BoundingBox _boundingBox = null;
+    
+    //Storage for parent
+    public Vector3 PositionOfParent { get; private set; } = Vector3.zero;
+    
     private void Awake()
     {
         myNumber = GetComponentInChildren<TMP_Text>();
@@ -35,6 +39,7 @@ public class boxDetection : MonoBehaviour
     {
         originalText = myNumber.text;
         IsInBoundingBox = BoundingBoxCheckRay();
+        PositionOfParent = transform.parent.position;
     }
     
     public void ShootRay()

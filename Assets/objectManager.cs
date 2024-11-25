@@ -71,19 +71,21 @@ public class objectManager : MonoBehaviour
 
             #region Populate the list of BoundingBox
 
-            for (int i = 0; i < hitObject.transform.childCount; i++)
+            if (hitObject != null)
             {
-                Transform childTransform = hitObject.transform.GetChild(i);
-                BoundingBox childStoredBoundinBox = hitObject.transform.GetChild(i).GetComponent<boxDetection>()._boundingBox;
-                if (childStoredBoundinBox != null)
+                for (int i = 0; i < hitObject.transform.childCount; i++)
                 {
-                    BoundingBoxWithTile childStoredBoundinBoxWithTile = new BoundingBoxWithTile(childStoredBoundinBox, childTransform);
-                    boxesToHighlight.Add(childStoredBoundinBoxWithTile);
+                    Transform childTransform = hitObject.transform.GetChild(i);
+                    BoundingBox childStoredBoundinBox = hitObject.transform.GetChild(i).GetComponent<boxDetection>()._boundingBox;
+                    if (childStoredBoundinBox != null)
+                    {
+                        BoundingBoxWithTile childStoredBoundinBoxWithTile = new BoundingBoxWithTile(childStoredBoundinBox, childTransform);
+                        boxesToHighlight.Add(childStoredBoundinBoxWithTile);
+                    }
                 }
             }
 
             #endregion
-
 
             ResetZPosition();
         }
@@ -104,7 +106,14 @@ public class objectManager : MonoBehaviour
         }
         else if (Input.GetKeyUp(KeyCode.Mouse0) && hitObject != null)
         {
-            DetachFromMouse(hitObject);
+            if (boxesToHighlight.Count == hitObject.transform.childCount)
+            {
+                DetachFromMouse(hitObject);
+            }
+            else
+            {
+                hitObject.transform.position = hitObject.transform.GetChild(0).GetComponent<boxDetection>().PositionOfParent;
+            }
             OnObjectReleased?.Invoke(); // Shoots a ray from the cubes and checks if the cell occupies any bounding boxes
 
             boxDetection[] boxDetections = hitObject.GetComponentsInChildren<boxDetection>();
