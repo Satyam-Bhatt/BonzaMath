@@ -132,6 +132,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1594640442671561165, guid: 36f7fab2bbc937b4b94881d372837e7e, type: 3}
   m_PrefabInstance: {fileID: 2115363852000479425}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &152333406 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4599636443956821488, guid: 36f7fab2bbc937b4b94881d372837e7e, type: 3}
+  m_PrefabInstance: {fileID: 1339202078}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &277652487
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -758,6 +763,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7417430124375409081, guid: 64ecc2b5f95b1cc46abb40a09e8036cd, type: 3}
   m_PrefabInstance: {fileID: 487343387}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1005528586 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4599636443956821488, guid: 36f7fab2bbc937b4b94881d372837e7e, type: 3}
+  m_PrefabInstance: {fileID: 2115363852000479425}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1174070337 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7417430124375409081, guid: 64ecc2b5f95b1cc46abb40a09e8036cd, type: 3}
@@ -771,6 +781,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1174070337}
     m_Modifications:
+    - target: {fileID: 1203760109140102516, guid: 70d573879289ded4a9590865dbc292c6, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1203760109140102516, guid: 70d573879289ded4a9590865dbc292c6, type: 3}
+      propertyPath: m_Color.b
+      value: 0.9803922
+      objectReference: {fileID: 0}
+    - target: {fileID: 1203760109140102516, guid: 70d573879289ded4a9590865dbc292c6, type: 3}
+      propertyPath: m_Color.g
+      value: 0.72156864
+      objectReference: {fileID: 0}
+    - target: {fileID: 1203760109140102516, guid: 70d573879289ded4a9590865dbc292c6, type: 3}
+      propertyPath: m_Color.r
+      value: 0.48627454
+      objectReference: {fileID: 0}
     - target: {fileID: 4289947135459365401, guid: 70d573879289ded4a9590865dbc292c6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1837,6 +1863,8 @@ MonoBehaviour:
   - {fileID: 1311310721}
   - {fileID: 469650532}
   - {fileID: 1531496768}
+  - {fileID: 152333406}
+  - {fileID: 1005528586}
   boxesToHighlight: []
 --- !u!4 &2055653401
 Transform:
