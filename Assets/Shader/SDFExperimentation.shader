@@ -15,6 +15,7 @@ Shader "Unlit/SDFExperimentation"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #define PI 3.14159265359
 
             #include "UnityCG.cginc"
 
@@ -74,15 +75,22 @@ Shader "Unlit/SDFExperimentation"
             float4 frag (v2f i) : SV_Target
             {
                 i.uv = i.uv * 2 - 1;
-                //return float4(i.uv,0,1);
-                float d1 = SDF_Box(i.uv - (sin(_Time.y) * 1.2 + 1.2) , float2(0.5,0.5));
-                float d2 = SDF_Circle(i.uv + (sin(_Time.y) * 1.2 + 1.2),float2(0,-0.2), 0.4);
-                float minD = min(d1,d2);
-                minD = SmoothMinimum(d2,d1, 2);
-
-                float4 col = lerp(_Color1,_Color2, minD);
-                return  col;
-                return float4(minD.xxx,1);
+                
+                // 2 SDF Meeting Code
+                // float d1 = SDF_Box(i.uv - (sin(_Time.y) * 1.2 + 1.2) , float2(0.5,0.5));
+                // float d2 = SDF_Circle(i.uv + (sin(_Time.y) * 1.2 + 1.2),float2(0,-0.2), 0.4);
+                // float minD = min(d1,d2);
+                // minD = SmoothMinimum(d2,d1, 2);
+                //
+                // float4 col = lerp(_Color1,_Color2, minD);
+                
+                //New Code
+                float wavy = sin(PI * _Time.y/8) + 0.2;
+                float square = SDF_Box(i.uv, float2(0,0) + wavy);// - 0.2;
+                //square = saturate(square);
+                float4 col = lerp(_Color1,_Color2, square);
+                return col;
+                return float4(square.xxx,1);
             }
             ENDCG
         }
