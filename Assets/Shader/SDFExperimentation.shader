@@ -100,6 +100,10 @@ Shader "Unlit/SDFExperimentation"
                 int numberOfCells = 10;
                 float2 newUV = frag.uv * numberOfCells;
                 float2 segments = frac(newUV);
+                segments = segments * 2 - 1;
+                float box = (SDF_Box(segments, float2(0.5, 0.5)) + 0.4);
+                //box = box * sin(_Time.y * PI / 2) * 0.5 + 0.5;
+                //return float4(box.xxx,1);
                 float sqValue = 1;
                 for (int i = 1; i <= numberOfCells; i++)
                 {
@@ -112,10 +116,13 @@ Shader "Unlit/SDFExperimentation"
                 }
                 float2 blockedUV = floor(newUV);
                 float maskGrid = 1 - reverseStep(sqValue, 0);
-                float4 col_Mask = float4(sin(Random(blockedUV) * _Time.y * PI/2).xxx,1);
-                float4 boxyColor = lerp(_Color1,_Color2, col_Mask);
-                float4 ColorWithLines = lerp(boxyColor, float4(0,0,0,1), maskGrid);
-                return ColorWithLines;
+                float4 col_Mask = float4(sin(Random(blockedUV) * _Time.y * PI / 2).xxx, 1);
+
+                box = box * sin(Random(blockedUV) * _Time.y * PI / 2) * 0.5 + 0.5; //This still doesn't does what I want it to do
+
+                float4 boxyColor = lerp(_Color1, _Color2, col_Mask);
+                float4 ColorWithLines = lerp(boxyColor, float4(0, 0, 0, 1), maskGrid);
+                return ColorWithLines * box;
             }
             ENDCG
         }
