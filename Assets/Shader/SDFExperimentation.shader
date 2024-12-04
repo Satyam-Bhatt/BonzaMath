@@ -116,7 +116,8 @@ Shader "Unlit/SDFExperimentation"
                 }
                 float2 blockedUV = floor(newUV);
                 float maskGrid = 1 - reverseStep(sqValue, 0);
-                float4 col_Mask = float4(sin(Random(blockedUV) * _Time.y * PI / 2).xxx, 1);
+                float4 col_Mask = float4((sin(Random(blockedUV) * _Time.y * PI / 4) * 0.5 + 0.5).xxx, 1);
+               // return col_Mask;
 
                 box = box * sin(Random(blockedUV) * _Time.y * PI / 2) * 0.5 + 0.5; //This still doesn't does what I want it to do
 
