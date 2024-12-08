@@ -97,13 +97,22 @@ Shader "Unlit/SDFExperimentation"
                 // return col;
 
                 //New Code
-                int numberOfCells = 10;
+                int numberOfCells = 5;
                 float2 newUV = frag.uv * numberOfCells;
                 float2 segments = frac(newUV);
-                segments = segments * 2 - 1;
-                float box = (SDF_Box(segments, float2(0.5, 0.5)) + 0.4);
+                //segments = segments * 2 - 1;
+                float box = (SDF_Box(segments, float2(0.5, 0.5)));
                 //box = box * sin(_Time.y * PI / 2) * 0.5 + 0.5;
-                //return float4(box.xxx,1);
+                float2 segment2 = abs(1-segments);
+float2 s2, z;
+                for(int i = 0; i < 9; i++)
+                {
+                    s2 = float2(i/3, i%3) - 1.;
+                    z = abs(segments - 0.5 - s2) - 0.5;
+                }
+
+                return float4(z,0,1);
+                return float4(box.xxx,1);
                 float sqValue = 1;
                 for (int i = 1; i <= numberOfCells; i++)
                 {
