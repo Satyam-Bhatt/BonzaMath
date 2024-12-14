@@ -85,55 +85,67 @@ Shader "Unlit/SDFExperimentation"
                 // return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
             }
 
-            float4 frag(v2f frag) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
-                // 2 SDF Meeting Code
-                // frag.uv = frag.uv * 2 - 1;
-                // float d1 = SDF_Box(frag.uv - (sin(_Time.y) * 1.2 + 1.2) , float2(0.5,0.5));
-                // float d2 = SDF_Circle(frag.uv + (sin(_Time.y) * 1.2 + 1.2),float2(0,-0.2), 0.4);
-                // float minD = min(d1,d2);
-                // minD = SmoothMinimum(d2,d1, 2);
-                // float4 col = lerp(_Color1,_Color2, minD);
-                // return col;
-
-                //New Code
                 int numberOfCells = 5;
-                float2 newUV = frag.uv * numberOfCells;
+                float2 newUV = i.uv * numberOfCells;
                 float2 segments = frac(newUV);
-                //segments = segments * 2 - 1;
-                float box = (SDF_Box(segments, float2(0.5, 0.5)));
-                //box = box * sin(_Time.y * PI / 2) * 0.5 + 0.5;
-                float2 segment2 = abs(1-segments);
-float2 s2, z;
-                for(int i = 0; i < 9; i++)
-                {
-                    s2 = float2(i/3, i%3) - 1.;
-                    z = abs(segments - 0.5 - s2) - 0.5;
-                }
+                float2 floored = floor(newUV);
 
-                return float4(z,0,1);
-                return float4(box.xxx,1);
-                float sqValue = 1;
-                for (int i = 1; i <= numberOfCells; i++)
-                {
-                    for (int j = 1; j <= numberOfCells; j++)
-                    {
-                        float2 value = float2(i - 0.5, j - 0.5);
-                        float squareFor = SDF_Box(newUV - value, float2(0.49, 0.49));
-                        sqValue *= squareFor;
-                    }
-                }
-                float2 blockedUV = floor(newUV);
-                float maskGrid = 1 - reverseStep(sqValue, 0);
-                float4 col_Mask = float4((sin(Random(blockedUV) * _Time.y * PI / 4) * 0.5 + 0.5).xxx, 1);
-               // return col_Mask;
-
-                box = box * sin(Random(blockedUV) * _Time.y * PI / 2) * 0.5 + 0.5; //This still doesn't does what I want it to do
-
-                float4 boxyColor = lerp(_Color1, _Color2, col_Mask);
-                float4 ColorWithLines = lerp(boxyColor, float4(0, 0, 0, 1), maskGrid);
-                return ColorWithLines * box;
+                return float4(i.uv,0,1);
             }
+
+            // float4 frag(v2f frag) : SV_Target
+            // {
+            //     // 2 SDF Meeting Code
+            //     // frag.uv = frag.uv * 2 - 1;
+            //     // float d1 = SDF_Box(frag.uv - (sin(_Time.y) * 1.2 + 1.2) , float2(0.5,0.5));
+            //     // float d2 = SDF_Circle(frag.uv + (sin(_Time.y) * 1.2 + 1.2),float2(0,-0.2), 0.4);
+            //     // float minD = min(d1,d2);
+            //     // minD = SmoothMinimum(d2,d1, 2);
+            //     // float4 col = lerp(_Color1,_Color2, minD);
+            //     // return col;
+            //
+            //     //New Code
+            //     int numberOfCells = 5;
+            //     float2 newUV = frag.uv * numberOfCells;
+            //     float2 segments = frac(newUV);
+            //     float2 floored = floor(newUV);
+            //     //segments = segments * 2 - 1;
+            //     float box = (SDF_Box(segments, float2(0.5, 0.5)));
+            //     //box = box * sin(_Time.y * PI / 2) * 0.5 + 0.5;
+            //     float2 segment2 = abs(1-segments);
+            //     float2 s2, z;
+            //     float n;
+            //     for(int i = 0; i < 9; i++)
+            //     {
+            //         s2 = float2(i/3, i%3) - 1.;
+            //         z = abs(frag.uv - 0.5 - s2) - 0.5;
+            //         n = (length(max(z,0)) + min(max(z.x,z.y),0))/max(sin(_Time.y * 0.5 + Random(floored + s2)) - sin(_Time.y * 0.5 + Random(floored)), 0.05)/2.;
+            //     }
+            //     return float4(z,0, 1);
+            //     return float4(box.xxx,1);
+            //     float sqValue = 1;
+            //     for (int i = 1; i <= numberOfCells; i++)
+            //     {
+            //         for (int j = 1; j <= numberOfCells; j++)
+            //         {
+            //             float2 value = float2(i - 0.5, j - 0.5);
+            //             float squareFor = SDF_Box(newUV - value, float2(0.49, 0.49));
+            //             sqValue *= squareFor;
+            //         }
+            //     }
+            //     float2 blockedUV = floor(newUV);
+            //     float maskGrid = 1 - reverseStep(sqValue, 0);
+            //     float4 col_Mask = float4((sin(Random(blockedUV) * _Time.y * PI / 4) * 0.5 + 0.5).xxx, 1);
+            //    // return col_Mask;
+            //
+            //     box = box * sin(Random(blockedUV) * _Time.y * PI / 2) * 0.5 + 0.5; //This still doesn't does what I want it to do
+            //
+            //     float4 boxyColor = lerp(_Color1, _Color2, col_Mask);
+            //     float4 ColorWithLines = lerp(boxyColor, float4(0, 0, 0, 1), maskGrid);
+            //     return ColorWithLines * box;
+            // }
             ENDCG
         }
     }
