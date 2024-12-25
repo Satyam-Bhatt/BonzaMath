@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -55,12 +56,20 @@ public class OperatorCalculatingScript : MonoBehaviour
                 }
             }
         }
-        
-        allNumbers = allNumbers.Remove(allNumbers.Length - 1);
-        
-        //Debug.Log(allNumbers);
-        totalText.text = allNumbers + "=" + EquationEvaluator.Evaluate(allNumbers);
 
+        if (allNumbers != "")
+        {
+            allNumbers = allNumbers.Remove(allNumbers.Length - 1);
+            
+            //Debug.Log(allNumbers);
+            totalText.text = allNumbers + "=" + EquationEvaluator.Evaluate(allNumbers);
+        }
+        else
+        {
+            allNumbers = "0";
+            totalText.text = "0";
+        }
+        
         WinCheckAndTextUpdate(EquationEvaluator.Evaluate(allNumbers));
     }
 
