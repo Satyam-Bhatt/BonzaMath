@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
 public class objectManager : MonoBehaviour
 {
@@ -41,6 +43,11 @@ public class objectManager : MonoBehaviour
     public List<BoundingBoxWithTile> boxesToHighlight = new List<BoundingBoxWithTile>();
     private BoundingBox _boxToHighlight = null;
     private Transform _relaventTile = null;
+
+    void Start()
+    {
+        boundingBoxes = GameObject.FindGameObjectsWithTag("BoundingBox"); //Not efficient
+    }
 
     // Update is called once per frame
     void Update()
