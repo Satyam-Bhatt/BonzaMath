@@ -74,6 +74,7 @@ public class boxDetection : MonoBehaviour
         IsInBoundingBox = BoundingBoxCheckRay();
     }
 
+    //Called when the object is picked up
     public void Subscribe()
     {
         objectManager.Instance.OnObjectReleased += ShootRay;
@@ -85,6 +86,7 @@ public class boxDetection : MonoBehaviour
             objectManager.Instance.OnObjectReleased -= ShootRay;
     }
 
+    //Called when the object is picked up
     public void ResetText()
     {
         myNumber.text = originalText;
@@ -93,6 +95,9 @@ public class boxDetection : MonoBehaviour
             colliderNum.text = collidedText;
         }
         collidedText = "";
+        
+        //If the object is picked from a bounding box method recalculates the value in the bounding box
+        if(_boundingBox != null) _boundingBox.RecalculateNumber(transform.parent.name);
     }
     
     //Called after shoot ray. Shoot ray is called on mouse release
@@ -111,21 +116,6 @@ public class boxDetection : MonoBehaviour
             }
             else
             {
-                if (_boundingBox != null && _boundingBox.storedObject.Count > 0)
-                {
-                    foreach (var bd in _boundingBox.storedObject)
-                    {
-                        Debug.Log(bd.name);
-                        boxDetection[] bd_Scripts = bd.GetComponentsInChildren<boxDetection>();
-
-                        foreach (var scripts in bd_Scripts)
-                        {
-                            Debug.Log(scripts.name);
-                            scripts.ShootRay_Temp();
-                        }
-                    }
-                }
-                
                 foundBoundingBox = false;
                 _boundingBox = null;
             }
@@ -146,11 +136,10 @@ public class boxDetection : MonoBehaviour
         }
         return numberWithOperator;
     }
-
-    public void ShootRay_Temp()
+    
+    //Called by the bounding box when we want to recalculate the figure
+    public void ShootRay_Revaluate()
     {
-        Debug.Log("Calllll: " + gameObject.name);
-        
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction);
         
@@ -162,20 +151,26 @@ public class boxDetection : MonoBehaviour
         {
             if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
             {
+                
+            }
+        }
+
+        foreach (var h in hit)
+        {
+            if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
+            {
                 colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
                 collidedText = colliderNum.text;
 
                 newText = NumberOpertatorCombine() + colliderNum.text;
-                Debug.Log("newText: " + newText);
                 colliderNum.text = "";
-                myNumber.text = EquationEvaluator.Evaluate(newText);
+                //myNumber.text = EquationEvaluator.Evaluate(newText);
                 break;
             }
             else
             {
                 colliderNum = null;
                 collidedText = "";
-                myNumber.text = originalText;
             }
         }
     }
