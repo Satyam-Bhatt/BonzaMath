@@ -18,16 +18,21 @@ public class OperatorCalculatingScript : MonoBehaviour
 
     //-----------------OBJECTIVE TEXT--------------
     [SerializeField] private TMP_Text objectiveNumber;
+    
+    //-----------------LEVEL NUMBER----------------
+    [SerializeField] private TMP_Text levelNumber;
 
     private void OnEnable()
     {
         objectManager.Instance.UpdateTotalText += UpdateText;
+        SceneManager.sceneLoaded += ChangeScene;
     }
 
     private void OnDisable()
     {
         if (objectManager.Instance != null)
             objectManager.Instance.UpdateTotalText -= UpdateText;
+        SceneManager.sceneLoaded -= ChangeScene;
     }
 
     private void Start()
@@ -91,7 +96,7 @@ public class OperatorCalculatingScript : MonoBehaviour
         Debug.Log("Next Level");
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         currentSceneIndex++;
-        if(currentSceneIndex < SceneManager.sceneCount)
+        if(currentSceneIndex < SceneManager.sceneCountInBuildSettings)
             SceneManager.LoadScene(currentSceneIndex);
     }
 
@@ -128,6 +133,14 @@ public class OperatorCalculatingScript : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         UpdateText();
+    }
+    
+    //Called everytime the scene changes
+    private void ChangeScene(Scene scene, LoadSceneMode mode)
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        currentSceneIndex++;
+        levelNumber.text = currentSceneIndex.ToString();
     }
 }
 

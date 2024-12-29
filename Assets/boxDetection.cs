@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
 public class boxDetection : MonoBehaviour
 {
@@ -94,6 +95,7 @@ public class boxDetection : MonoBehaviour
         collidedText = "";
     }
     
+    //Called after shoot ray. Shoot ray is called on mouse release
     private bool BoundingBoxCheckRay()
     {
         Ray ray = new Ray(transform.position, transform.forward);
@@ -109,6 +111,21 @@ public class boxDetection : MonoBehaviour
             }
             else
             {
+                if (_boundingBox != null && _boundingBox.storedObject.Count > 0)
+                {
+                    foreach (var bd in _boundingBox.storedObject)
+                    {
+                        Debug.Log(bd.name);
+                        boxDetection[] bd_Scripts = bd.GetComponentsInChildren<boxDetection>();
+
+                        foreach (var scripts in bd_Scripts)
+                        {
+                            Debug.Log(scripts.name);
+                            scripts.ShootRay_Temp();
+                        }
+                    }
+                }
+                
                 foundBoundingBox = false;
                 _boundingBox = null;
             }
@@ -128,6 +145,39 @@ public class boxDetection : MonoBehaviour
             numberWithOperator += n.text;
         }
         return numberWithOperator;
+    }
+
+    public void ShootRay_Temp()
+    {
+        Debug.Log("Calllll: " + gameObject.name);
+        
+        Ray ray = new Ray(transform.position, transform.forward);
+        RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction);
+        
+        //Reset Everything
+        colliderNum = null;
+        collidedText = "";
+
+        foreach (var h in hit)
+        {
+            if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
+            {
+                colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
+                collidedText = colliderNum.text;
+
+                newText = NumberOpertatorCombine() + colliderNum.text;
+                Debug.Log("newText: " + newText);
+                colliderNum.text = "";
+                myNumber.text = EquationEvaluator.Evaluate(newText);
+                break;
+            }
+            else
+            {
+                colliderNum = null;
+                collidedText = "";
+                myNumber.text = originalText;
+            }
+        }
     }
 }
 

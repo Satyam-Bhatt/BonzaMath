@@ -51,7 +51,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Type 4- Level-5.unity
     guid: c3febe12b34ab2942868f118843d72ba
   - enabled: 1
-    path: Assets/Scenes/Type 4- Level-5.1.unity
+    path: Assets/Scenes/Type 4- Level-5.1(Buggy).unity
     guid: 05d47a834224b6f46863f889b827214b
   - enabled: 1
     path: Assets/Scenes/Type 4- Level-5.2.unity
