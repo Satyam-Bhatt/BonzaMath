@@ -569,6 +569,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Addition Variant (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 3504239227479622342, guid: cf984dfd78f77fb40a260d178454d1a4, type: 3}
+      propertyPath: m_text
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6709233871180779997, guid: cf984dfd78f77fb40a260d178454d1a4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1

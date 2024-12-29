@@ -63,11 +63,11 @@ public class BoundingBox : MonoBehaviour
         ChangeColor(storedObject.Count > 0 ? Color.black : Color.white);
     }
 
-    public void RecalculateNumber(string objectName)
+    public void RecalculateNumber(GameObject objectParent)
     {
         if (storedObject.Count > 0)
         {
-            Debug.Log("Passed Object Name: " + objectName);
+            Debug.Log("Passed Object Name: " + objectParent.name);
             
             foreach (GameObject gO in storedObject)
             {
@@ -77,7 +77,7 @@ public class BoundingBox : MonoBehaviour
             Debug.Log("Last Object To be added: " + storedObject[storedObject.Count - 1].name);
             
             //if the name of the last object is not the same then we will need to recalculate
-            if (storedObject[storedObject.Count - 1].name != objectName)
+            if (storedObject[storedObject.Count - 1].name != objectParent.name)
             {
                 GameObject  parent = storedObject[storedObject.Count - 1];
 
@@ -87,7 +87,7 @@ public class BoundingBox : MonoBehaviour
                     if ((Vector2)child.transform.position == (Vector2)transform.position)
                     {
                         Debug.Log("Right Child Spotted : " + child.name);
-                        child.GetComponent<boxDetection>().ShootRay();
+                        child.GetComponent<boxDetection>().ShootRay_Revaluate(objectParent);
                     }
                     else
                     {
