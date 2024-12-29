@@ -91,7 +91,8 @@ public class OperatorCalculatingScript : MonoBehaviour
         Debug.Log("Next Level");
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
         currentSceneIndex++;
-        SceneManager.LoadScene(currentSceneIndex);
+        if(currentSceneIndex < SceneManager.sceneCount)
+            SceneManager.LoadScene(currentSceneIndex);
     }
 
     private void Sort_Boxes()
