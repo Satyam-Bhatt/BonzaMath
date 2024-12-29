@@ -42,10 +42,15 @@ public class boxDetection : MonoBehaviour
         PositionOfParent = transform.parent.position;
     }
     
+    //Called when the mouse button is released
     public void ShootRay()
     {
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction);
+        
+        //Reset Everything
+        colliderNum = null;
+        collidedText = "";
 
         foreach (var h in hit)
         {

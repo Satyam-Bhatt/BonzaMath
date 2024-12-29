@@ -6,27 +6,60 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Discarded/Type 3 Level-1.unity
-    guid: 4b37233aad6660642a975d69c5f53185
+    path: Assets/Scenes/Type 4- Level-1.unity
+    guid: 188f29070cd9d264691906619c94ea6f
   - enabled: 1
-    path: Assets/Scenes/Discarded/Type 3 Level-2.unity
-    guid: 8418d87d76098b845a7b3a87ff9cd3f3
+    path: Assets/Scenes/Type 4- Level-2.unity
+    guid: 9a6856cca544db54db269b5f63378092
   - enabled: 1
-    path: Assets/Scenes/Discarded/Type 3 Level-3.unity
-    guid: ebc00c62ca8bd9449a44d50e67c2f85b
+    path: Assets/Scenes/Type 4- Level-2.1.unity
+    guid: 9caf9d82698d13e42a59ccd64c342e18
   - enabled: 1
-    path: Assets/Scenes/Discarded/Type 3 Level-4.unity
-    guid: 05d79d367a3b9b749965274f982d47db
+    path: Assets/Scenes/Type 4- Level-2.2.unity
+    guid: c6d60126d4d08524c979ecae5a837dcc
   - enabled: 1
-    path: Assets/Scenes/Discarded/Type 3 Level-5.unity
-    guid: 2a9532d61d8fd4742b6323791419e53c
+    path: Assets/Scenes/Type 4- Level-2.3.unity
+    guid: 934445d10814e4042a3702e1500910f2
   - enabled: 1
-    path: Assets/Scenes/Discarded/Type 3 Level-6.unity
-    guid: 1b811dd58ebcbb84f86dc33433afd14d
+    path: Assets/Scenes/Type 4- Level-3.unity
+    guid: 6b24b8cac18e2cf4e9e307b63c52284e
   - enabled: 1
-    path: Assets/Scenes/Discarded/Type 3 Level-7.unity
-    guid: 5f56fe92e3a5721459b7f51b877c435d
+    path: Assets/Scenes/Type 4- Level-3.1.unity
+    guid: c3d990954171327428c59b6b03be5072
   - enabled: 1
-    path: Assets/Scenes/Discarded/Type 3 Level-8.unity
-    guid: cd7d3c72762c1ff4aa85631e8107c6b1
+    path: Assets/Scenes/Type 4- Level-3.2.unity
+    guid: 86c6fe8ca3889c64fb5900b549384913
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-3.3.unity
+    guid: 4fcee65cfa4ec514d9b1bafde2308466
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-4.unity
+    guid: cf53dc85a68b3c14c875225ae2837a41
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-4.1.unity
+    guid: 7ac01fe90fdef8747a1196827e16c090
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-4.2.unity
+    guid: c8a83cb00abffbd4290434869fe5db5e
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-4.3.unity
+    guid: 2940d9c97e38b5b4083c858ebdb5f903
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-4.4.unity
+    guid: 0e5101593c4a1c045b42fb7b9189c97b
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-5.unity
+    guid: c3febe12b34ab2942868f118843d72ba
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-5.1.unity
+    guid: 05d47a834224b6f46863f889b827214b
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-5.2.unity
+    guid: db586d281850a1d4593ce647a877c15e
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-6.unity
+    guid: 575d88575d30d654bb27058ba22e7d92
+  - enabled: 1
+    path: Assets/Scenes/Type 4- Level-6.1.unity
+    guid: 84f9889407c34e24d8d8b30afc1f36d5
   m_configObjects: {}
