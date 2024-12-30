@@ -95,9 +95,11 @@ public class boxDetection : MonoBehaviour
             colliderNum.text = collidedText;
         }
         collidedText = "";
-        
+
+        _boundingBox = null;
+
         //If the object is picked from a bounding box method recalculates the value in the bounding box
-        if(_boundingBox != null) _boundingBox.RecalculateNumber(transform.parent.gameObject);
+        if (_boundingBox != null) _boundingBox.RecalculateNumber(transform.parent.gameObject);
     }
     
     //Called after shoot ray. Shoot ray is called on mouse release
