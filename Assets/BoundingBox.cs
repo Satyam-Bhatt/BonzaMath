@@ -67,6 +67,7 @@ public class BoundingBox : MonoBehaviour
     {
         if (storedObject.Count > 0)
         {
+            //Change
             Debug.Log("Passed Object Name: " + objectParent.name);
             
             foreach (GameObject gO in storedObject)
