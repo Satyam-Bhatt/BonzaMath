@@ -97,7 +97,7 @@ public class boxDetection : MonoBehaviour
         collidedText = "";
         
         //If the object is picked from a bounding box method recalculates the value in the bounding box
-        if (_boundingBox != null) _boundingBox.RecalculateNumber(transform.parent.gameObject);
+        if (_boundingBox != null) _boundingBox.RecalculateNumber_OnClick(transform.parent.gameObject);
 
         _boundingBox = null;
 

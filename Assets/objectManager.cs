@@ -137,6 +137,7 @@ public class objectManager : MonoBehaviour
                 foreach (BoundingBoxWithTile b in boxesToHighlight)
                 {
                     b.boundingBox.storedObject.Add(hitObject);
+                    b.boundingBox.RecalculateNumber_OnRelease();
                     b.boundingBox.ChangeColor(Color.black); //Color when the cell is occupied
                 }
             }

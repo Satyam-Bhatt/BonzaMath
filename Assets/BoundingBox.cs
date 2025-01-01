@@ -64,8 +64,54 @@ public class BoundingBox : MonoBehaviour
         ChangeColor(storedObject.Count > 0 ? Color.black : Color.white);
     }
 
+    public void RecalculateNumber_OnRelease()
+    {
+        if (storedObject.Count > 0)
+        {
+            List<boxDetection> boxesInBoundingBox = new List<boxDetection>();
+            if (storedObject.Count > 1)
+            {
+                foreach (var sO in storedObject)
+                {
+                    boxDetection[] boxesInObject = sO.GetComponentsInChildren<boxDetection>();
+                    foreach (boxDetection box in boxesInObject)
+                    {
+                        if ((Vector2)box.transform.position == (Vector2)transform.position)
+                        {
+                            boxesInBoundingBox.Add(box);
+                        }
+                    }
+                }
 
-    public void RecalculateNumber(GameObject objectParent)
+                string number = "";
+                for (int i = boxesInBoundingBox.Count - 1; i >= 0; i--)
+                {
+                    TMP_Text[] numberPlusOperator = boxesInBoundingBox[i].GetComponentsInChildren<TMP_Text>();
+                    for(int j = 0; j < numberPlusOperator.Length; j++)
+                    {
+                        if (j == 0)
+                        {
+                            number += boxesInBoundingBox[i].originalText;
+                        }
+                        else
+                        {
+                            number += numberPlusOperator[j].text;
+                        }
+                    }
+
+                }
+
+                Debug.Log(number);
+            }
+            else
+            {
+                //Don't need to calculate as there is only one Block
+            }
+        }
+    }
+
+
+    public void RecalculateNumber_OnClick(GameObject objectParent)
     {
         if (storedObject.Count > 0)
         {
@@ -79,7 +125,7 @@ public class BoundingBox : MonoBehaviour
                   boxDetection[] boxesInObject = sO.GetComponentsInChildren<boxDetection>();
                   foreach (boxDetection box in boxesInObject)
                   {
-                      if ((Vector2)box.transform.position == (Vector2)objectParent.transform.position)
+                      if ((Vector2)box.transform.position == (Vector2)transform.position)
                       {
                           boxesInBoundingBox.Add(box);
                       }
@@ -87,21 +133,24 @@ public class BoundingBox : MonoBehaviour
                 }
                 
                 string number = "";
-                foreach (var bBB in boxesInBoundingBox)
+
+                for (int i = boxesInBoundingBox.Count - 1; i >= 0; i--)
                 {
-                    TMP_Text[] numberPlusOperator = bBB.GetComponentsInChildren<TMP_Text>();
-                    for(int i = 0; i < numberPlusOperator.Length; i++)
+                    TMP_Text[] numberPlusOperator = boxesInBoundingBox[i].GetComponentsInChildren<TMP_Text>();
+                    for(int j = 0; j < numberPlusOperator.Length; j++)
                     {
-                        if (i == 0)
+                        if (j == 0)
                         {
-                            number += bBB.originalText;
+                            number += boxesInBoundingBox[i].originalText;
                         }
                         else
                         {
-                            number += numberPlusOperator[i].text;
+                            number += numberPlusOperator[j].text;
                         }
                     }
+
                 }
+                
                 Debug.Log(number);
             }
             else
