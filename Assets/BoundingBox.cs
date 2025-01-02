@@ -69,20 +69,19 @@ public class BoundingBox : MonoBehaviour
         if (storedObject.Count > 0)
         {
             List<boxDetection> boxesInBoundingBox = new List<boxDetection>();
-            if (storedObject.Count > 1)
+            foreach (var sO in storedObject)
             {
-                foreach (var sO in storedObject)
+                boxDetection[] boxesInObject = sO.GetComponentsInChildren<boxDetection>();
+                foreach (boxDetection box in boxesInObject)
                 {
-                    boxDetection[] boxesInObject = sO.GetComponentsInChildren<boxDetection>();
-                    foreach (boxDetection box in boxesInObject)
+                    if ((Vector2)box.transform.position == (Vector2)transform.position)
                     {
-                        if ((Vector2)box.transform.position == (Vector2)transform.position)
-                        {
-                            boxesInBoundingBox.Add(box);
-                        }
+                        boxesInBoundingBox.Add(box);
                     }
                 }
-
+            }
+            if (storedObject.Count > 1)
+            {
                 string number = "";
                 for (int i = boxesInBoundingBox.Count - 1; i >= 0; i--)
                 {
@@ -100,12 +99,20 @@ public class BoundingBox : MonoBehaviour
                     }
 
                 }
+                char[] letters = number.ToCharArray();
+                if (letters[^1] is '+' or '-' or '*' or '/')
+                {
+                    Array.Resize(ref letters, letters.Length - 1);
+                }
 
-                Debug.Log(number);
+                string totalNum = EquationEvaluator.Evaluate(new string(letters));
+                //Debug.Log(totalNum);
+
+                boxesInBoundingBox[^1].GetComponentInChildren<TMP_Text>().text = totalNum;
             }
             else
             {
-                //Don't need to calculate as there is only one Block
+                boxesInBoundingBox[0].GetComponentInChildren<TMP_Text>().text = boxesInBoundingBox[0].originalText;
             }
         }
     }
@@ -113,24 +120,25 @@ public class BoundingBox : MonoBehaviour
 
     public void RecalculateNumber_OnClick(GameObject objectParent)
     {
+        if(storedObject.Count > 0) storedObject.Remove(objectParent);
+
         if (storedObject.Count > 0)
         {
-            storedObject.Remove(objectParent);
             List<boxDetection> boxesInBoundingBox = new List<boxDetection>();
+            foreach (var sO in storedObject)
+            {
+                boxDetection[] boxesInObject = sO.GetComponentsInChildren<boxDetection>();
+                foreach (boxDetection box in boxesInObject)
+                {
+                    if ((Vector2)box.transform.position == (Vector2)transform.position)
+                    {
+                        boxesInBoundingBox.Add(box);
+                    }
+                }
+            }
 
             if (storedObject.Count > 1)
             {
-                foreach (var sO in storedObject)
-                {
-                  boxDetection[] boxesInObject = sO.GetComponentsInChildren<boxDetection>();
-                  foreach (boxDetection box in boxesInObject)
-                  {
-                      if ((Vector2)box.transform.position == (Vector2)transform.position)
-                      {
-                          boxesInBoundingBox.Add(box);
-                      }
-                  }
-                }
                 
                 string number = "";
 
@@ -150,12 +158,22 @@ public class BoundingBox : MonoBehaviour
                     }
 
                 }
-                
-                Debug.Log(number);
+
+                char[] letters = number.ToCharArray();
+                if (letters[^1] is '+' or '-' or '*' or '/')
+                {
+                    Array.Resize(ref letters, letters.Length - 1);
+                }
+
+                string totalNum = EquationEvaluator.Evaluate(new string(letters));
+                Debug.Log(totalNum);
+
+                boxesInBoundingBox[^1].GetComponentInChildren<TMP_Text>().text = totalNum;
             }
             else
             {
                 //Have the number shown of the only one remaining
+                boxesInBoundingBox[0].GetComponentInChildren<TMP_Text>().text = boxesInBoundingBox[0].originalText;
             }
             
             

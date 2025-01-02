@@ -62,7 +62,7 @@ public class boxDetection : MonoBehaviour
 
                 newText = NumberOpertatorCombine() + colliderNum.text;
                 colliderNum.text = "";
-                myNumber.text = EquationEvaluator.Evaluate(newText);
+                //myNumber.text = EquationEvaluator.Evaluate(newText);
                 break;
             }
             else
@@ -91,9 +91,9 @@ public class boxDetection : MonoBehaviour
     {
         myNumber.text = originalText;
 
-        if (colliderNum != null) { 
-            colliderNum.text = collidedText;
-        }
+        // if (colliderNum != null) { 
+        //     colliderNum.text = collidedText;
+        // }
         collidedText = "";
         
         //If the object is picked from a bounding box method recalculates the value in the bounding box
