@@ -122,7 +122,7 @@ public class BoundingBox : MonoBehaviour
                         {
                             Array.Resize(ref letters, letters.Length - 1);
                         }
-
+                        //commit check
                         totalSum = EquationEvaluator.Evaluate(totalSum + new string(letters));
                         Debug.Log("Total Sum After: " + totalSum);
                         number = "" + lastLetter;
