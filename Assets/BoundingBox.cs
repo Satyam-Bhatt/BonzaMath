@@ -111,7 +111,10 @@ public class BoundingBox : MonoBehaviour
                         {
                             number += numberPlusOperator[j].text;
                         }
-                    }
+                    //This code checks for the 2 numbers and adds them together. 
+                    //TODO: FIX THE BUG INSIDE IT
+
+                    //T
                     if (iterations >= 1)
                     {
                         Debug.Log("Number before: " + number);
@@ -122,7 +125,6 @@ public class BoundingBox : MonoBehaviour
                         {
                             Array.Resize(ref letters, letters.Length - 1);
                         }
-                        //commit check
                         totalSum = EquationEvaluator.Evaluate(totalSum + new string(letters));
                         Debug.Log("Total Sum After: " + totalSum);
                         number = "" + lastLetter;
