@@ -66,62 +66,18 @@ public class BoundingBox : MonoBehaviour
 
     public void RecalculateNumber_OnRelease()
     {
-        if (storedObject.Count > 0)
-        {
-            List<boxDetection> boxesInBoundingBox = new List<boxDetection>();
-            foreach (var sO in storedObject)
-            {
-                boxDetection[] boxesInObject = sO.GetComponentsInChildren<boxDetection>();
-                foreach (boxDetection box in boxesInObject)
-                {
-                    if ((Vector2)box.transform.position == (Vector2)transform.position)
-                    {
-                        boxesInBoundingBox.Add(box);
-                    }
-                }
-            }
-            if (storedObject.Count > 1)
-            {
-                string number = "";
-                for (int i = boxesInBoundingBox.Count - 1; i >= 0; i--)
-                {
-                    TMP_Text[] numberPlusOperator = boxesInBoundingBox[i].GetComponentsInChildren<TMP_Text>();
-                    for(int j = 0; j < numberPlusOperator.Length; j++)
-                    {
-                        if (j == 0)
-                        {
-                            number += boxesInBoundingBox[i].originalText;
-                        }
-                        else
-                        {
-                            number += numberPlusOperator[j].text;
-                        }
-                    }
-
-                }
-                char[] letters = number.ToCharArray();
-                if (letters[^1] is '+' or '-' or '*' or '/')
-                {
-                    Array.Resize(ref letters, letters.Length - 1);
-                }
-
-                string totalNum = EquationEvaluator.Evaluate(new string(letters));
-                //Debug.Log(totalNum);
-
-                boxesInBoundingBox[^1].GetComponentInChildren<TMP_Text>().text = totalNum;
-            }
-            else
-            {
-                boxesInBoundingBox[0].GetComponentInChildren<TMP_Text>().text = boxesInBoundingBox[0].originalText;
-            }
-        }
+        RecalculateNumber();
     }
-
 
     public void RecalculateNumber_OnClick(GameObject objectParent)
     {
         if(storedObject.Count > 0) storedObject.Remove(objectParent);
 
+        RecalculateNumber();
+    }
+
+    private void RecalculateNumber()
+    {
         if (storedObject.Count > 0)
         {
             List<boxDetection> boxesInBoundingBox = new List<boxDetection>();
@@ -139,13 +95,13 @@ public class BoundingBox : MonoBehaviour
 
             if (storedObject.Count > 1)
             {
-                
                 string number = "";
-
+                string totalSum = "";
+                int iterations = 0;
                 for (int i = boxesInBoundingBox.Count - 1; i >= 0; i--)
                 {
                     TMP_Text[] numberPlusOperator = boxesInBoundingBox[i].GetComponentsInChildren<TMP_Text>();
-                    for(int j = 0; j < numberPlusOperator.Length; j++)
+                    for (int j = 0; j < numberPlusOperator.Length; j++)
                     {
                         if (j == 0)
                         {
@@ -156,57 +112,32 @@ public class BoundingBox : MonoBehaviour
                             number += numberPlusOperator[j].text;
                         }
                     }
+                    if (iterations >= 1)
+                    {
+                        Debug.Log("Number before: " + number);
+                        Debug.Log("Total Sum Before: " + totalSum);
+                        char[] letters = number.ToCharArray();
+                        string lastLetter = letters[^1].ToString();
+                        if (letters[^1] is '+' or '-' or '*' or '/')
+                        {
+                            Array.Resize(ref letters, letters.Length - 1);
+                        }
+
+                        totalSum = EquationEvaluator.Evaluate(totalSum + new string(letters));
+                        Debug.Log("Total Sum After: " + totalSum);
+                        number = "" + lastLetter;
+                    }
+                    iterations++;
 
                 }
 
-                char[] letters = number.ToCharArray();
-                if (letters[^1] is '+' or '-' or '*' or '/')
-                {
-                    Array.Resize(ref letters, letters.Length - 1);
-                }
-
-                string totalNum = EquationEvaluator.Evaluate(new string(letters));
-                Debug.Log(totalNum);
-
-                boxesInBoundingBox[^1].GetComponentInChildren<TMP_Text>().text = totalNum;
+                boxesInBoundingBox[^1].GetComponentInChildren<TMP_Text>().text = totalSum;
             }
             else
             {
                 //Have the number shown of the only one remaining
                 boxesInBoundingBox[0].GetComponentInChildren<TMP_Text>().text = boxesInBoundingBox[0].originalText;
             }
-            
-            
-            //Change
-           // Debug.Log("Passed Object Name: " + objectParent.name);
-            
-            foreach (GameObject gO in storedObject)
-            {
-                //Debug.Log("Nameee: " + gO.name);
-            }
-            
-            //Debug.Log("Last Object To be added: " + storedObject[storedObject.Count - 1].name);
-            
-            //if the name of the last object is not the same then we will need to recalculate
-            // if (storedObject[storedObject.Count - 1].name != objectParent.name)
-            // {
-            //     GameObject  parent = storedObject[storedObject.Count - 1];
-            //
-            //     for (int i = 0; i < parent.transform.childCount; i++)
-            //     {
-            //         GameObject child = parent.transform.GetChild(i).gameObject;
-            //         if ((Vector2)child.transform.position == (Vector2)transform.position)
-            //         {
-            //             //Debug.Log("Right Child Spotted : " + child.name);
-            //             child.GetComponent<boxDetection>().ShootRay_Revaluate(objectParent);
-            //         }
-            //         else
-            //         {
-            //             //Debug.Log("Wriong Child Spotted : " + child.name);
-            //         }
-            //     }
-            // }
-            
         }
     }
 }
