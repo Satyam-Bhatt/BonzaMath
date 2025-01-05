@@ -71,7 +71,7 @@ public class BoundingBox : MonoBehaviour
 
     public void RecalculateNumber_OnClick(GameObject objectParent)
     {
-        if(storedObject.Count > 0) storedObject.Remove(objectParent);
+        if (storedObject.Count > 0) storedObject.Remove(objectParent);
 
         RecalculateNumber();
     }
@@ -98,10 +98,16 @@ public class BoundingBox : MonoBehaviour
                 string number = "";
                 string totalSum = "";
                 int iterations = 0;
-                for (int i = boxesInBoundingBox.Count - 1; i >= 0; i--)
+
+                TMP_Text[] numberPlusOperator = boxesInBoundingBox[0].GetComponentsInChildren<TMP_Text>();
+                number += boxesInBoundingBox[0].originalText;
+                number += numberPlusOperator[1].text;
+
+                for (int i = 1; i < boxesInBoundingBox.Count; i++)
                 {
-                    TMP_Text[] numberPlusOperator = boxesInBoundingBox[i].GetComponentsInChildren<TMP_Text>();
-                    for (int j = 0; j < numberPlusOperator.Length; j++)
+
+                    TMP_Text[] numberPlusOperator2 = boxesInBoundingBox[i].GetComponentsInChildren<TMP_Text>();
+                    for (int j = 0; j < numberPlusOperator2.Length; j++)
                     {
                         if (j == 0)
                         {
@@ -109,31 +115,26 @@ public class BoundingBox : MonoBehaviour
                         }
                         else
                         {
-                            number += numberPlusOperator[j].text;
+                            number += numberPlusOperator2[j].text;
                         }
+                    }
                     //This code checks for the 2 numbers and adds them together. 
                     //TODO: FIX THE BUG INSIDE IT
+                    Debug.Log("Number before: " + number);
 
-                    //T
-                    if (iterations >= 1)
+                    Debug.Log("Total Sum Before: " + totalSum);
+                    char[] letters = number.ToCharArray();
+                    string lastLetter = letters[^1].ToString();
+                    if (letters[^1] is '+' or '-' or '*' or '/')
                     {
-                        Debug.Log("Number before: " + number);
-                        Debug.Log("Total Sum Before: " + totalSum);
-                        char[] letters = number.ToCharArray();
-                        string lastLetter = letters[^1].ToString();
-                        if (letters[^1] is '+' or '-' or '*' or '/')
-                        {
-                            Array.Resize(ref letters, letters.Length - 1);
-                        }
-                        totalSum = EquationEvaluator.Evaluate(totalSum + new string(letters));
-                        Debug.Log("Total Sum After: " + totalSum);
-                        number = "" + lastLetter;
+                        Array.Resize(ref letters, letters.Length - 1);
                     }
-                    iterations++;
-
+                    totalSum = EquationEvaluator.Evaluate(totalSum + new string(letters));
+                    Debug.Log("Total Sum After: " + totalSum);
+                    number = "" + lastLetter;
                 }
-
                 boxesInBoundingBox[^1].GetComponentInChildren<TMP_Text>().text = totalSum;
+
             }
             else
             {
