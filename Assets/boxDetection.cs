@@ -19,12 +19,12 @@ public class boxDetection : MonoBehaviour
     //BoundingBox fields storing the status and the bounding box
     [field: Space(10)]
     [field: Header("Bounding Box")]
-    [field: SerializeField] public bool IsInBoundingBox { get; private set; } = false; 
+    [field: SerializeField] public bool IsInBoundingBox { get; private set; } = false;
     public BoundingBox _boundingBox = null;
-    
+
     //Storage for parent
     public Vector3 PositionOfParent { get; private set; } = Vector3.zero;
-    
+
     private void Awake()
     {
         myNumber = GetComponentInChildren<TMP_Text>();
@@ -42,13 +42,13 @@ public class boxDetection : MonoBehaviour
         IsInBoundingBox = BoundingBoxCheckRay();
         PositionOfParent = transform.parent.position;
     }
-    
+
     //Called when the mouse button is released
     public void ShootRay()
     {
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction);
-        
+
         //Reset Everything
         colliderNum = null;
         collidedText = "";
@@ -95,14 +95,14 @@ public class boxDetection : MonoBehaviour
         //     colliderNum.text = collidedText;
         // }
         collidedText = "";
-        
+
         //If the object is picked from a bounding box method recalculates the value in the bounding box
         if (_boundingBox != null) _boundingBox.RecalculateNumber_OnClick(transform.parent.gameObject);
 
         _boundingBox = null;
 
     }
-    
+
     //Called after shoot ray. Shoot ray is called on mouse release
     private bool BoundingBoxCheckRay()
     {
@@ -123,7 +123,7 @@ public class boxDetection : MonoBehaviour
                 _boundingBox = null;
             }
         }
-        
+
         return foundBoundingBox;
     }
 
@@ -139,64 +139,6 @@ public class boxDetection : MonoBehaviour
         }
         return numberWithOperator;
     }
-    
-    //Called by the bounding box when we want to recalculate the figure
-    public void ShootRay_Revaluate(GameObject objectToIgnore)
-    {
-        Ray ray = new Ray(transform.position, transform.forward);
-        RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction);
-        
-        //Reset Everything
-        colliderNum = null;
-        collidedText = "";
 
-        foreach (var h in hit)
-        {
-            if (h.collider != null && h.collider.gameObject.tag == "ChildObject")
-            {
-                TMP_Text numberText = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
-                boxDetection bDScriptOnObject = h.collider.gameObject.GetComponent<boxDetection>();
-
-                numberText.text = bDScriptOnObject.originalText;
-                
-                Debug.Log("Originial Text: " + numberText.text);
-            }
-        }
-        
-        //Improve it in a way that it recalculates all the superimpositions
-        foreach (var h in hit)
-        {
-            bool calculate = true;
-            if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
-            {
-                for (int i = 0; i < objectToIgnore.transform.childCount; i++)
-                {
-                    if (h.collider.gameObject == objectToIgnore.transform.GetChild(i).gameObject)
-                    {
-                        calculate = false;
-                        break;
-                    }
-                }
-
-                if (calculate)
-                {
-                    colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
-                    collidedText = colliderNum.text;
-            
-                    newText = NumberOpertatorCombine() + colliderNum.text;
-                    colliderNum.text = "";
-                    Debug.Log("new Text: "+ newText);
-                    myNumber.text = EquationEvaluator.Evaluate(newText);
-                    Debug.Log("myNumber.text: "+ myNumber.text);
-                    break; //This breaks out of that constant calculation
-                }
-            }
-            else
-            {
-                colliderNum = null;
-                collidedText = "";
-            }
-        }
-    }
 }
 
