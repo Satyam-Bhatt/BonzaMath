@@ -63,6 +63,20 @@ public class objectManager : MonoBehaviour
                 if (h.collider != null && h.collider.gameObject.tag == "MainObject")
                 {
                     hitObject = h.collider.gameObject;
+
+                    #region Populate the list of BoundingBox To check distance with them
+                    for (int i = 0; i < hitObject.transform.childCount; i++)
+                    {
+                        Transform childTransform = hitObject.transform.GetChild(i);
+                        BoundingBox childStoredBoundinBox = hitObject.transform.GetChild(i).GetComponent<boxDetection>()._boundingBox;
+                        if (childStoredBoundinBox != null)
+                        {
+                            BoundingBoxWithTile childStoredBoundinBoxWithTile = new BoundingBoxWithTile(childStoredBoundinBox, childTransform);
+                            boxesToHighlight.Add(childStoredBoundinBoxWithTile);
+                        }
+                    }
+                    #endregion
+
                     boxDetection[] boxDetections = hitObject.GetComponentsInChildren<boxDetection>();
                     foreach (boxDetection bD in boxDetections)
                     {
@@ -75,24 +89,6 @@ public class objectManager : MonoBehaviour
             }
 
             SendHitObject?.Invoke(hitObject);
-
-            #region Populate the list of BoundingBox
-
-            if (hitObject != null)
-            {
-                for (int i = 0; i < hitObject.transform.childCount; i++)
-                {
-                    Transform childTransform = hitObject.transform.GetChild(i);
-                    BoundingBox childStoredBoundinBox = hitObject.transform.GetChild(i).GetComponent<boxDetection>()._boundingBox;
-                    if (childStoredBoundinBox != null)
-                    {
-                        BoundingBoxWithTile childStoredBoundinBoxWithTile = new BoundingBoxWithTile(childStoredBoundinBox, childTransform);
-                        boxesToHighlight.Add(childStoredBoundinBoxWithTile);
-                    }
-                }
-            }
-
-            #endregion
 
             ResetZPosition();
         }

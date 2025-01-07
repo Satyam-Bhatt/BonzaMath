@@ -58,11 +58,8 @@ public class boxDetection : MonoBehaviour
             if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
             {
                 colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
-                collidedText = colliderNum.text;
 
-                newText = NumberOpertatorCombine() + colliderNum.text;
                 colliderNum.text = "";
-                //myNumber.text = EquationEvaluator.Evaluate(newText);
                 break;
             }
             else
@@ -91,12 +88,8 @@ public class boxDetection : MonoBehaviour
     {
         myNumber.text = originalText;
 
-        // if (colliderNum != null) { 
-        //     colliderNum.text = collidedText;
-        // }
         collidedText = "";
 
-        //If the object is picked from a bounding box method recalculates the value in the bounding box
         if (_boundingBox != null) _boundingBox.RecalculateNumber_OnClick(transform.parent.gameObject);
 
         _boundingBox = null;
@@ -125,19 +118,6 @@ public class boxDetection : MonoBehaviour
         }
 
         return foundBoundingBox;
-    }
-
-
-    //Gets the two text fields one containg the number and the other containing the operator and combines them
-    private string NumberOpertatorCombine()
-    {
-        TMP_Text[] numberPlusOperator = GetComponentsInChildren<TMP_Text>();
-        string numberWithOperator = "";
-        foreach (var n in numberPlusOperator)
-        {
-            numberWithOperator += n.text;
-        }
-        return numberWithOperator;
     }
 
 }
