@@ -74,6 +74,7 @@ public class BoundingBox : MonoBehaviour
             if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
             {
                 storedObject.Add(h.collider.transform.parent.gameObject);
+                ChangeColor(Color.black);
             }
         }
     }
