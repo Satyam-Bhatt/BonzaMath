@@ -25,6 +25,11 @@ public class BoundingBox : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        CheckForAlreadyPresentNumber();
+    }
+
     public void Fill(bool state)
     {
         CanBeFilled = state;
@@ -56,6 +61,20 @@ public class BoundingBox : MonoBehaviour
         else
         {
             ChangeColor(Color.white);
+        }
+    }
+
+    private void CheckForAlreadyPresentNumber()
+    {
+        Ray ray = new Ray(transform.position, transform.forward);
+        RaycastHit2D[] hit = Physics2D.RaycastAll(ray.origin, ray.direction);
+
+        foreach (var h in hit)
+        {
+            if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
+            {
+                storedObject.Add(h.collider.transform.parent.gameObject);
+            }
         }
     }
 

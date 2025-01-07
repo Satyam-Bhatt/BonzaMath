@@ -125,8 +125,6 @@ public class objectManager : MonoBehaviour
                 bD.Unsubscribe();
             }
 
-            UpdateTotalText?.Invoke();
-
             //Adds the Hit Object to the corresponding bounding boxes.
             if (boxesToHighlight.Count > 0)
             {
@@ -137,6 +135,8 @@ public class objectManager : MonoBehaviour
                     b.boundingBox.ChangeColor(Color.black); //Color when the cell is occupied
                 }
             }
+
+            UpdateTotalText?.Invoke();
 
             boxesToHighlight.Clear();
 
