@@ -36,6 +36,7 @@ Shader "Unlit/SquareShader"
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 return o;
             }
 
@@ -49,12 +50,15 @@ Shader "Unlit/SquareShader"
 
             float4 frag (v2f i) : SV_Target
             {
+                float4 col = tex2D(_MainTex, i.uv);
+                return col;
                 i.uv = i.uv * 5;
                 i.uv = frac(i.uv);
                 i.uv = 2 * i.uv - 1;
                 float varyingValue = 0.5 - cos(_Time.y) * 0.5;
                 float box = SDF_Box(i.uv , float2(varyingValue,varyingValue));
                 box = step(box, 0);
+
                 return float4(box.xxx, 1);
             }
             ENDCG
