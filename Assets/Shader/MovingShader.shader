@@ -3,7 +3,7 @@ Shader "Unlit/MovingShader"
     Properties
     {
         _MainTe ("Texture", 2D) = "white" {}
-        _PerlinNoise ("Texture", 2D) = "white" {}
+        _PerlinNoise ("Noise", 2D) = "white" {}
 
     }
     SubShader
@@ -18,6 +18,11 @@ Shader "Unlit/MovingShader"
 
             #include "UnityCG.cginc"
 
+            sampler2D _MainTe;
+            sampler2D _PerlinNoise;
+            float4 _MainTe_ST;
+            float4 _PerlinNoise_ST;
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -30,10 +35,6 @@ Shader "Unlit/MovingShader"
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTe;
-            sampler2D _PerlinNoise;
-            float4 _MainTe_ST;
-
             v2f vert (appdata v)
             {
                 v2f o;
@@ -45,11 +46,13 @@ Shader "Unlit/MovingShader"
             float4 frag (v2f i) : SV_Target
             {
                 // sample the texture
+                float2 noiseUV = i.uv;
+                noiseUV.x = noiseUV.x * 0.2 + _Time.y * 0.1;
                 float4 col = tex2D(_MainTe, i.uv);
-                float4 noise = tex2D(_PerlinNoise, i.uv);
-                //noise = step(noise, 0);
-                float lerppp = lerp(float4(0,0,0,1), col, noise);
-                return lerppp;
+                float4 noise = tex2D(_PerlinNoise, noiseUV);
+                float2 uvcheck = i.uv + 0.2 * noise;
+                float4 lerppp = lerp(col, float4(0,0,0,1), noise);
+                return float4(uvcheck, 0,1);
             }
             ENDCG
         }
