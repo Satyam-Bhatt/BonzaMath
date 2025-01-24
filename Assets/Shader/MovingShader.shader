@@ -47,12 +47,13 @@ Shader "Unlit/MovingShader"
             {
                 // sample the texture
                 float2 noiseUV = i.uv;
-                noiseUV.x = noiseUV.x * 0.2 + _Time.y * 0.1;
-                float4 col = tex2D(_MainTe, i.uv);
-                float4 noise = tex2D(_PerlinNoise, noiseUV);
-                float2 uvcheck = i.uv + 0.2 * noise;
-                float4 lerppp = lerp(col, float4(0,0,0,1), noise);
-                return float4(uvcheck, 0,1);
+                noiseUV.x = noiseUV.x + sin(_Time.y ); //Moving UV in x direction
+                noiseUV.y = noiseUV.y + cos(_Time.y * 0.5 ); //Moving UV in y direction
+                float4 noise = tex2D(_PerlinNoise, noiseUV); //Sampling a B/W texture with moving UV
+                //Creating a new UV with the moving noise texture. As the noise texture values are between 0 and 1 the new UV is moving back and forth
+                float2 uvcheck = i.uv + 0.2 * noise; 
+				float4 col = tex2D(_MainTe, uvcheck);//Sampling the main texture with this UV
+                return col;
             }
             ENDCG
         }
