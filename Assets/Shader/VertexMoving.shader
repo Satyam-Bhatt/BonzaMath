@@ -39,18 +39,41 @@ Shader "Unlit/VertexMoving"
             v2f vert (appdata v)
             {
                 v2f o;
+
+                //Waves
+                float offset = cos(v.uv.y * PI * _a) * _c + 0.5;
+                float z = cos((v.uv.x * _b + offset) * PI + _Time.y * 5) * 0.5 + 0.5;
+				v.vertex.x += 0.001 * z;
+
+                //Bend in X axis
+                float uvY = saturate(sin(v.uv.y * 2 * PI + PI * 1.5) * 0.5 + 0.5);
+                uvY = 1 - uvY;
+                v.vertex.x += 0.00 * uvY;
+
+                //Bend in Y axis
+                float uvX = saturate(sin(v.uv.x * 2 * PI + PI * 1.5) * 0.5 + 0.5);
+                uvX = 1 - uvX;
+                v.vertex.y += 0.00 * uvX;
+
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+
                 return o;
             }
 
             float4 frag (v2f i) : SV_Target
             {
                 float4 col = tex2D(_MainTex, i.uv);
+
+                //Test Code for Waves
                 float offset = cos(i.uv.y * PI * _a) * _c + 0.5;
-                float z = cos((i.uv.x * _b + offset) * PI) * 0.5 + 0.5;
-                //return offset;
-                return z;
+                float z = cos((i.uv.x * _b + offset) * PI + _Time.y * 5) * 0.5 + 0.5;
+
+                float uvY = saturate(sin(i.uv.y * 2 * PI + PI * 1.5) * 0.5 + 0.5);
+                uvY = 1 - uvY;
+                //Test Code End
+
+                return col;
             }
             ENDCG
         }
