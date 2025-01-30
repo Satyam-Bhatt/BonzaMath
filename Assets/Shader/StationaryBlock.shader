@@ -39,6 +39,13 @@ Shader "Unlit/StationaryBlock"
                 return o;
             }
 
+            float2x2 Rotation(float angle)
+            {
+                float s = sin(angle);
+				float c = cos(angle);
+				return float2x2(c, s, -s, c);
+            }
+
             float SDF_Box(float2 p, float2 b)
             {
                 float2 d = abs(p)-b;
@@ -57,7 +64,7 @@ Shader "Unlit/StationaryBlock"
             float4 frag (v2f i) : SV_Target
             {
                 float4 col = tex2D(_MainTex, i.uv);
-                float box = SDF_Box(i.uv * 2 - 1, float2(0.5, 0.5));
+                float box = SDF_Box(mul(Rotation(_Time.y), (i.uv * 2 - 1)) , float2(0.5, 0.5));
                 float annular = abs(box);
                 return annular;
             }
