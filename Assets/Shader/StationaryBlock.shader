@@ -59,24 +59,39 @@ Shader "Unlit/StationaryBlock"
                 return length(max(d, float2(0,0))) + min(min(d.x, d.y), 0.0);
             }
 
-            float4 frag (v2f i) : SV_Target
+            float4 frag (v2f frag) : SV_Target
             {
-                float scaleFactor = sin(_Time.y * 0.5) * 0.5 + 1;
-                // float box = abs(SDF_Box(mul(Rotation(-_Time.y * 0.3),i.uv * 2 - 1) , float2(scaleFactor, scaleFactor)));
-                // float box2 = abs(SDF_Box2(mul(Rotation(-_Time.y * 0.3),i.uv * 2 - 1) * scaleFactor * scaleFactor , float2(scaleFactor/2, scaleFactor/2)));
-                // float box3 = abs(SDF_Box(mul(Rotation(_Time.y * 0.3),i.uv * 2 - 1) , float2(scaleFactor/4, scaleFactor/4)));
-                // float box4 = abs(SDF_Box2(mul(Rotation(_Time.y * 0.3),i.uv * 2 - 1) * scaleFactor * scaleFactor * scaleFactor , float2(scaleFactor/6, scaleFactor/6)));
+                float effect = 1000;
 
-                float box = abs(SDF_Box(i.uv * 2 - 1 , float2(scaleFactor, scaleFactor)));
-                float box2 = abs(SDF_Box2((i.uv * 2 - 1) * scaleFactor * scaleFactor , float2(scaleFactor/2, scaleFactor/2)));
-                float box3 = abs(SDF_Box(i.uv * 2 - 1 , float2(scaleFactor/4, scaleFactor/4)));
-                float box4 = abs(SDF_Box2((i.uv * 2 - 1) * scaleFactor * scaleFactor * scaleFactor , float2(scaleFactor/6, scaleFactor/6)));
+                for(int i = 0; i < 13; i+=2)
+                {
+                   float layerTime = _Time.y * 0.1 + i * (1.0 / 12);
+                   float scaleFactor = fmod(layerTime, 1.2) ;
+                   float box = abs(SDF_Box(frag.uv * 2 - 1 , float2(scaleFactor, scaleFactor)));
+                   effect = min(effect, box);
+                }
 
-                float bothBox = min(box, box2);
-                bothBox = min(bothBox, box3);
-				bothBox = min(bothBox, box4);
-                return bothBox;
+                return effect;
             }
+
+    //         float4 frag (v2f i) : SV_Target
+    //         {
+    //             float scaleFactor = sin(_Time.y * 0.5) * 0.5 + 1;
+    //             // float box = abs(SDF_Box(mul(Rotation(_Time.y * 0.3),i.uv * 2 - 1) , float2(scaleFactor, scaleFactor)));
+    //             // float box2 = abs(SDF_Box2(mul(Rotation(_Time.y * 0.3),i.uv * 2 - 1) * scaleFactor * scaleFactor , float2(scaleFactor/2, scaleFactor/2)));
+    //             // float box3 = abs(SDF_Box(mul(Rotation(_Time.y * 0.3),i.uv * 2 - 1) , float2(scaleFactor/4, scaleFactor/4)));
+    //             // float box4 = abs(SDF_Box2(mul(Rotation(_Time.y * 0.3),i.uv * 2 - 1) * scaleFactor * scaleFactor * scaleFactor , float2(scaleFactor/6, scaleFactor/6)));
+
+    //             float box = abs(SDF_Box(i.uv * 2 - 1 , float2(scaleFactor, scaleFactor)));
+    //             float box2 = abs(SDF_Box2((i.uv * 2 - 1) * scaleFactor * scaleFactor , float2(scaleFactor/2, scaleFactor/2)));
+    //             float box3 = abs(SDF_Box(i.uv * 2 - 1 , float2(scaleFactor/4, scaleFactor/4)));
+    //             float box4 = abs(SDF_Box2((i.uv * 2 - 1) * scaleFactor * scaleFactor * scaleFactor , float2(scaleFactor/6, scaleFactor/6)));
+
+    //             float bothBox = min(box, box2);
+    //             bothBox = min(bothBox, box3);
+				// bothBox = min(bothBox, box4);
+    //             return bothBox;
+    //         }
 
             // float4 frag (v2f i) : SV_Target
             // {
