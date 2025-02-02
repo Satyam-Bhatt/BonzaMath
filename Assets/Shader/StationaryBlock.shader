@@ -59,23 +59,25 @@ Shader "Unlit/StationaryBlock"
                 return length(max(d, float2(0,0))) + min(min(d.x, d.y), 0.0);
             }
 
+            //Infinite Zoom
+            // float4 frag (v2f frag) : SV_Target
+            // {
+            //     float effect = 1000;
+
+            //     for(int i = 0; i < 13; i+=2)
+            //     {
+            //        float layerTime = _Time.y * 0.1 + i * (1.0 / 12);
+            //        float scaleFactor = fmod(layerTime, 1.2) ;
+            //        //float scaleFactor = fmod(layerTime * i/10, 1.2) ;
+            //        float box = abs(SDF_Box(frag.uv * 2 - 1 , float2(scaleFactor, scaleFactor)));
+            //        effect = min(effect, box);
+            //     }
+
+            //     return effect;
+            // }
+
             float4 frag (v2f frag) : SV_Target
             {
-                float effect = 1000;
-
-                for(int i = 0; i < 13; i+=2)
-                {
-                   float layerTime = _Time.y * 0.1 + i * (1.0 / 12);
-                   float scaleFactor = fmod(layerTime, 1.2) ;
-                   float box = abs(SDF_Box(frag.uv * 2 - 1 , float2(scaleFactor, scaleFactor)));
-                   effect = min(effect, box);
-                }
-
-                return effect;
-            }
-
-    //         float4 frag (v2f i) : SV_Target
-    //         {
     //             float scaleFactor = sin(_Time.y * 0.5) * 0.5 + 1;
     //             // float box = abs(SDF_Box(mul(Rotation(_Time.y * 0.3),i.uv * 2 - 1) , float2(scaleFactor, scaleFactor)));
     //             // float box2 = abs(SDF_Box2(mul(Rotation(_Time.y * 0.3),i.uv * 2 - 1) * scaleFactor * scaleFactor , float2(scaleFactor/2, scaleFactor/2)));
@@ -91,47 +93,31 @@ Shader "Unlit/StationaryBlock"
     //             bothBox = min(bothBox, box3);
 				// bothBox = min(bothBox, box4);
     //             return bothBox;
-    //         }
 
-            // float4 frag (v2f i) : SV_Target
-            // {
-            //     float2 uv = i.uv * 2.0 - 1.0; // Center UVs [-1, 1]
-    
-            //     float speed = 0.2;
-            //     float period = 1.5;
-            //     float minScale = 0.25;
-            //     int numLayers = 10;
-            //     float tunnelEffect = 1000.0; // Initialize with a large value
-    
-            //     for (int idx = 0; idx < numLayers; idx++)
-            //     {
-            //         // Offset each layer's time to stagger animations
-            //         float layerTime = _Time.y * speed + idx * (period / numLayers);
-            //         float scale = fmod(layerTime, period) + minScale;
-        
-            //         // Exponentially decrease scale per layer
-            //         float currentScale = scale * pow(0.5, idx);
-        
-            //         // Calculate box SDF and take absolute value
-            //         float box = abs(SDF_Box(uv, float2(currentScale, currentScale)));
-        
-            //         // Keep the smallest SDF value
-            //         tunnelEffect = min(tunnelEffect, box);
-            //     }
-    
-            //     return tunnelEffect;
-            // }
+                float effect = 1000;
 
-            // float4 frag (v2f i) : SV_Target
-            // {
-            //     float scaleFactor = fmod(_Time.y * 0.2, 1.5) + 0.25;
-            //     float box = SDF_Box(mul(Rotation(_Time.y),i.uv * 2 - 1) , float2(scaleFactor, scaleFactor));
-            //     float box2 = SDF_Box2(mul(Rotation(-_Time.y),i.uv * 2 - 1) , float2(scaleFactor, scaleFactor));
-            //     float annular = abs(box);
-            //     float annular2 = abs(box2);
-            //     float bothBox = min(annular, annular2);
-            //     return bothBox;
-            // }
+                for(int i = 0; i <= 8; i++)
+                {
+                    float scaleFactor = sin(_Time.y * 0.5) * 0.5 + 0.7;
+
+                    float layerTime = _Time.y * 0.1 + i * (1.0 / 8);
+                    float scaleFactor2 = fmod(layerTime, 1.2) ;
+
+                    if(i % 2 != 0)
+					{
+						float box = abs(SDF_Box(frag.uv * 2 - 1 , float2(scaleFactor2, scaleFactor2)));
+						effect = min(effect, box);
+					}
+					else
+					{
+						float box = abs(SDF_Box2((frag.uv * 2 - 1) * pow(scaleFactor, i/2) , float2(scaleFactor/i/2, scaleFactor/i/2)));
+						effect = min(effect, box);
+					}
+                }
+
+                return effect;
+            }
+
             ENDCG
         }
     }
