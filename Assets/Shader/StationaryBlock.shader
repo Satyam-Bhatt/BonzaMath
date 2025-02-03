@@ -3,6 +3,7 @@ Shader "Unlit/StationaryBlock"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _MainTex2 ("Texture2", 2D) = "white" {}
     }
     SubShader
     {
@@ -30,6 +31,8 @@ Shader "Unlit/StationaryBlock"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            sampler2D _MainTex2;
+			float4 _MainTex2_ST;
 
             v2f vert (appdata v)
             {
@@ -115,7 +118,12 @@ Shader "Unlit/StationaryBlock"
 					}
                 }
 
-                return effect;
+                float4 colTex = tex2D(_MainTex, frag.uv);
+                float4 colTex2 = tex2D(_MainTex2, frag.uv);
+
+                float4 check = lerp(colTex - 0.2, float4(0,0,0,1), effect);
+
+                return check;
             }
 
             ENDCG
