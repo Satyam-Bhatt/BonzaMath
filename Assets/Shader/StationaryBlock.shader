@@ -2,8 +2,9 @@ Shader "Unlit/StationaryBlock"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _MainTex1 ("Texture", 2D) = "white" {}
         _MainTex2 ("Texture2", 2D) = "white" {}
+        _Color ("Color", Color) = (1,1,1,1)
     }
     SubShader
     {
@@ -29,16 +30,17 @@ Shader "Unlit/StationaryBlock"
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+            sampler2D _MainTex1;
+            float4 _MainTex1_ST;
             sampler2D _MainTex2;
 			float4 _MainTex2_ST;
+            float4 _Color;
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex1);
                 return o;
             }
 
@@ -101,7 +103,7 @@ Shader "Unlit/StationaryBlock"
 
                 for(int i = 0; i <= 8; i++)
                 {
-                    float scaleFactor = sin(_Time.y * 0.5) * 0.5 + 0.7;
+                    float scaleFactor = sin(_Time.y * 0.5) * 0.5 + 0.8;
 
                     float layerTime = _Time.y * 0.1 + i * (1.0 / 8);
                     float scaleFactor2 = fmod(layerTime, 1.2) ;
@@ -118,10 +120,12 @@ Shader "Unlit/StationaryBlock"
 					}
                 }
 
-                float4 colTex = tex2D(_MainTex, frag.uv);
+                //effect = step(effect, 0.01);
+
+                float4 colTex = tex2D(_MainTex1, frag.uv);
                 float4 colTex2 = tex2D(_MainTex2, frag.uv);
 
-                float4 check = lerp(colTex - 0.2, float4(0,0,0,1), effect);
+                float4 check = lerp(_Color, colTex + 0.8, effect);
 
                 return check;
             }
