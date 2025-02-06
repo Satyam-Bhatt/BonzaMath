@@ -40,16 +40,22 @@ Shader "Unlit/SomeShader"
                 return o;
             }
 
+            float SDF_Circle(float2 p, float2 c, float r)
+			{
+				return length(p - c) - r;
+			}
+
             float4 frag (v2f i) : SV_Target
             {
                 // sample the texture
                 float4 col = tex2D(_MainTex, i.uv);
                 float2 uv = i.uv * 4;
-                float2 repeat = frac(uv);
-                repeat = sin(repeat * PI * 2) * 0.5 + 0.5;
-                repeat = pow(repeat, 2);
-                float v = repeat.x + repeat.y;
-                return float4(v.xxx,1);
+                float2 repeat = frac(uv) * 2 - 1;
+                
+                float dis = saturate(1 - length(repeat)) * saturate((length(repeat) + 1));
+                float dis2 = SDF_Circle(frac(i.uv * 4), float2(0.5, 0.5), 0.4);
+                float check = lerp(dis, dis2, sin(_Time.y) * 0.5 + 0.5);
+                return float4(check.xxx,1);
             }
             ENDCG
         }
