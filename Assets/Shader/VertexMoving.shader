@@ -83,17 +83,23 @@ Shader "Unlit/VertexMoving"
 
                 // sample the texture
                 float2 noiseUV = i.uv * 0.5;
-                if(abs(_DirectionX) > 0.01)
+                if(abs(_DirectionX) != 0)
                 {
-                    noiseUV.x =  noiseUV.x + _DirectionX/abs(_DirectionX) * _Time.y * 0.5; //Moving UV in x direction
+                      noiseUV.x =  noiseUV.x + clamp(_DirectionX, -1, 1)/2 * _Time.y;// * 0.5; //Moving UV in x direction
                 }
-                if(abs(_DirectionY) > 0.01)
+                if(abs(_DirectionY) != 0)
                 {
-                    noiseUV.y =  noiseUV.y + _DirectionY/abs(_DirectionY) * _Time.y * 0.5; //Moving UV in y direction
+                      noiseUV.y =  noiseUV.y + clamp(_DirectionY, -1, 1)/2 * _Time.y;// * 0.5; //Moving UV in y direction
                 }
                 float4 noise = tex2D(_PerlinNoise, noiseUV); //Sampling a B/W texture with moving UV
-                //Creating a new UV with the moving noise texture. As the noise texture values are between 0 and 1 the new UV is moving back and forth
-                float2 uvcheck = i.uv + 0.2 * noise; 
+
+                float2 uvcheck = i.uv;
+                if(abs(_DirectionY) != 0 || abs(_DirectionX) != 0)
+                {
+                    //Creating a new UV with the moving noise texture. As the noise texture values are between 0 and 1 the new UV is moving back and forth
+                    uvcheck = i.uv + 0.2 * noise; 
+                }
+
 				float4 col = tex2D(_MainTex, uvcheck);//Sampling the main texture with this UV
                 return col;
             }
