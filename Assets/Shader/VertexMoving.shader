@@ -9,6 +9,8 @@ Shader "Unlit/VertexMoving"
 		_c("c", float) = 0
         _DirectionX("DirectionX", float) = 0
 		_DirectionY("DirectionY", float) = 0
+        _SignX("SignX", float) = 0
+		_SignY("SignY", float) = 0
         _Bend("Bend", float) = 0
     }
     SubShader
@@ -39,7 +41,7 @@ Shader "Unlit/VertexMoving"
             sampler2D _MainTex;
             float4 _MainTex_ST;
             sampler2D _PerlinNoise;
-            float _a, _b, _c, _DirectionX, _DirectionY, _Bend;
+            float _a, _b, _c, _DirectionX, _DirectionY, _Bend, _SignX, _SignY;
 
             v2f vert (appdata v)
             {
@@ -83,24 +85,35 @@ Shader "Unlit/VertexMoving"
 
                 // sample the texture
                 float2 noiseUV = i.uv * 0.5;
+
                 if(abs(_DirectionX) != 0)
                 {
-                      //noiseUV.x =  noiseUV.x + clamp(_DirectionX, -1, 1)/2 * _Time.y;// * 0.5; //Moving UV in x direction
-                      noiseUV.x =  noiseUV.x + (0.5 * (abs(_DirectionX)/_DirectionX) * _Time.y);// * 0.5; //Moving UV in x direction
-
+                    //noiseUV.x =  noiseUV.x + clamp(_DirectionX, -1, 1)/2 * _Time.y;// * 0.5; //Moving UV in x direction
+                    noiseUV.x =  noiseUV.x + (0.5 * (abs(_DirectionX)/_DirectionX) * _Time.y);// * 0.5; //Moving UV in x direction
                 }
+                else
+                {
+                    noiseUV.x =  noiseUV.x + (_SignX * 0.2 * _Time.y);
+                }
+
                 if(abs(_DirectionY) != 0)
                 {
-                      noiseUV.y =  noiseUV.y + clamp(_DirectionY, -1, 1)/2 * _Time.y;// * 0.5; //Moving UV in y direction
+                    //noiseUV.y =  noiseUV.y + clamp(_DirectionY, -1, 1)/2 * _Time.y;// * 0.5; //Moving UV in y direction
+                    noiseUV.y =  noiseUV.y + (0.5 * (abs(_DirectionY)/_DirectionY) * _Time.y);
                 }
+                else
+                {
+                    noiseUV.y =  noiseUV.y + ( _SignY * 0.2 * _Time.y);
+                }
+
                 float4 noise = tex2D(_PerlinNoise, noiseUV); //Sampling a B/W texture with moving UV
 
                 float2 uvcheck = i.uv;
-                if(abs(_DirectionY) != 0 || abs(_DirectionX) != 0)
-                {
+                //if(abs(_DirectionY) != 0 || abs(_DirectionX) != 0)
+                //{
                     //Creating a new UV with the moving noise texture. As the noise texture values are between 0 and 1 the new UV is moving back and forth
                     uvcheck = i.uv + 0.2 * noise; 
-                }
+                //}
 
 				float4 col = tex2D(_MainTex, uvcheck);//Sampling the main texture with this UV
                 return col;

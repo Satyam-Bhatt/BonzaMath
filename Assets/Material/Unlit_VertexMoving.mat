@@ -36,6 +36,8 @@ Material:
     - _Bend: 0.005
     - _DirectionX: 0
     - _DirectionY: 0
+    - _SignX: 0
+    - _SignY: 0
     - _a: 4.93
     - _b: 1.54
     - _c: 0.5

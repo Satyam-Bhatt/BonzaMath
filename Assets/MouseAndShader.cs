@@ -11,11 +11,6 @@ public class MouseAndShader : MonoBehaviour
 
     float valX, valY;
 
-    private IEnumerator storeRoutine;
-    float timeStore = 0;
-    bool isRunning = false;
-    bool timerRunning = false;
-
     private void Awake()
     {
         material = GetComponent<Renderer>().material;
@@ -26,81 +21,64 @@ public class MouseAndShader : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        storeRoutine = TestRoutine();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetAxis("Mouse X") != 0)
+
+        if (Input.GetAxis("Mouse X") > 0)
         {
-            timerRunning = true;
-            if(!isRunning)
-            {
-                //valX = valX + Input.GetAxis("Mouse X") * Time.deltaTime * 10;
-                StartCoroutine(storeRoutine);
-                isRunning = true;
-            }
+            valX += 4 * Time.deltaTime;
+            material.SetFloat("_SignX", 1);
         }
-        else if (Input.GetAxis("Mouse X") == 0 && isRunning)
+        else if (Input.GetAxis("Mouse X") < 0)
         {
-            timerRunning = false;
-            if(timeStore + 2f < Time.time)
+            valX -= 4 * Time.deltaTime;
+            material.SetFloat("_SignX", -1);
+
+        }
+        else
+        {
+            if (Approximate(valX, 0, 0.01f))
             {
-                StopCoroutine(storeRoutine);
-                isRunning = false;
-                Debug.Log("!!!");
                 valX = 0;
-            }    
-        }
-
-        if(timerRunning && isRunning)
-        {
-            timeStore = Time.time;
-        }
-
-        //Debug.Log(valX + " valY: " + valY);
-        material.SetFloat("_DirectionX", Mathf.Clamp(valX, -1, 1));
-        //material.SetFloat("_DirectionY", Mathf.Clamp(valY, -1, 1));
-    }
-
-    IEnumerator TestRoutine()
-    {
-        while (true)
-        {
-            valX += 0.01f * 2;
-            Debug.Log("+++++" + valX);
-            yield return new WaitForSeconds(0.05f);
-        }
-    }
-    IEnumerator StopOtherRoutine()
-    {
-        yield return new WaitForSeconds(2f);
-        if (Input.GetAxis("Mouse X") == 0)
-        {
-            StopCoroutine(storeRoutine);
-            Debug.Log("!!!");
-            valX = 0;
-        }
-    }
-
-    IEnumerator AnimateProperties()
-    {
-        while (true)
-        {
-            if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0)
-            {
-                material.SetFloat("_DirectionX", 1);
-                material.SetFloat("_DirectionY", 1);
             }
             else
             {
-                material.SetFloat("_DirectionX", 0);
-                material.SetFloat("_DirectionY", 0);
+                valX = Mathf.Lerp(valX, 0, 4 * Time.deltaTime);
             }
-
-
-            yield return new WaitForSeconds(0.2f);
         }
+
+        if(Input.GetAxis("Mouse Y") > 0)
+        {
+            valY += 4 * Time.deltaTime;
+            material.SetFloat("_SignY", 1);
+        }
+        else if (Input.GetAxis("Mouse Y") < 0)
+        {
+            valY -= 4 * Time.deltaTime;
+            material.SetFloat("_SignY", -1);
+        }
+        else
+        {
+            if (Approximate(valY, 0, 0.01f))
+            {
+                valY = 0;
+            }
+            else
+            {
+                valY = Mathf.Lerp(valY, 0, 4 * Time.deltaTime);
+            }
+        }
+
+        material.SetFloat("_DirectionX", Mathf.Clamp(valX, -1, 1));
+        material.SetFloat("_DirectionY", Mathf.Clamp(valY, -1, 1));
+    }
+
+    private bool Approximate(float a, float b, float threshold)
+    {
+        return Mathf.Abs(a - b) < threshold;
     }
 }
