@@ -85,7 +85,9 @@ Shader "Unlit/VertexMoving"
                 float2 noiseUV = i.uv * 0.5;
                 if(abs(_DirectionX) != 0)
                 {
-                      noiseUV.x =  noiseUV.x + clamp(_DirectionX, -1, 1)/2 * _Time.y;// * 0.5; //Moving UV in x direction
+                      //noiseUV.x =  noiseUV.x + clamp(_DirectionX, -1, 1)/2 * _Time.y;// * 0.5; //Moving UV in x direction
+                      noiseUV.x =  noiseUV.x + (0.5 * (abs(_DirectionX)/_DirectionX) * _Time.y);// * 0.5; //Moving UV in x direction
+
                 }
                 if(abs(_DirectionY) != 0)
                 {

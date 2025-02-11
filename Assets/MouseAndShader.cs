@@ -68,7 +68,7 @@ public class MouseAndShader : MonoBehaviour
     {
         while (true)
         {
-            valX += 0.01f;
+            valX += 0.01f * 2;
             Debug.Log("+++++" + valX);
             yield return new WaitForSeconds(0.05f);
         }
