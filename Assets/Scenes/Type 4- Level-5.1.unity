@@ -1086,7 +1086,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47c4ed98a1eed6f479cba252def499d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  material: {fileID: 2100000, guid: 6f5fd9fb61427074fa8c844121016e6c, type: 2}
   num: {x: 0, y: 0}
   threshold: 0.01
 --- !u!1001 &1591296027

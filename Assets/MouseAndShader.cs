@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MouseAndShader : MonoBehaviour
 {
-    public Material material;
+    private Material material;
     public Vector2 num;
     public float threshold = 0.5f;
 
@@ -13,7 +13,6 @@ public class MouseAndShader : MonoBehaviour
 
     private void Awake()
     {
-        material = GetComponent<Renderer>().material;
         valX = 0;
         valY = 0;
     }
@@ -21,7 +20,9 @@ public class MouseAndShader : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        Material materialInstance = Instantiate(GetComponent<MeshRenderer>().sharedMaterial);
+        GetComponent<MeshRenderer>().material = materialInstance;
+        material = materialInstance;
     }
 
     // Update is called once per frame
@@ -37,7 +38,6 @@ public class MouseAndShader : MonoBehaviour
         {
             valX -= 4 * Time.deltaTime;
             material.SetFloat("_SignX", -1);
-
         }
         else
         {

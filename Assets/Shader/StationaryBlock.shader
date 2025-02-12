@@ -2,7 +2,7 @@ Shader "Unlit/StationaryBlock"
 {
     Properties
     {
-        _MainTex1 ("Texture", 2D) = "white" {}
+        _MainTex ("Texture", 2D) = "white" {}
         _MainTex2 ("Texture2", 2D) = "white" {}
         _Color ("Color", Color) = (1,1,1,1)
     }
@@ -32,8 +32,8 @@ Shader "Unlit/StationaryBlock"
                 float4 color : TEXCOORD1;
             };
 
-            sampler2D _MainTex1;
-            float4 _MainTex1_ST;
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
             sampler2D _MainTex2;
 			float4 _MainTex2_ST;
             float4 _Color;
@@ -42,7 +42,7 @@ Shader "Unlit/StationaryBlock"
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex1);
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.color = v.color;
                 return o;
             }
@@ -125,7 +125,7 @@ Shader "Unlit/StationaryBlock"
 
                 //effect = step(effect, 0.01);
 
-                float4 colTex = tex2D(_MainTex1, frag.uv);
+                float4 colTex = tex2D(_MainTex, frag.uv);
                 float4 colTex2 = tex2D(_MainTex2, frag.uv);
 
                 float4 check = lerp(_Color, colTex + 0.8, effect);
