@@ -82,6 +82,8 @@ public class objectManager : MonoBehaviour
                     {
                         bD.Subscribe();
                         bD.ResetText();
+
+                        bD.GetComponent<MouseAndShader>().onHold = true;
                     }
 
                     break;
@@ -123,6 +125,8 @@ public class objectManager : MonoBehaviour
             foreach (boxDetection bD in boxDetections)
             {
                 bD.Unsubscribe();
+
+                bD.GetComponent<MouseAndShader>().onHold = false;
             }
 
             //Adds the Hit Object to the corresponding bounding boxes.

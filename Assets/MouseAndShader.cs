@@ -11,6 +11,8 @@ public class MouseAndShader : MonoBehaviour
 
     float valX, valY;
 
+    public bool onHold = false;
+
     private void Awake()
     {
         valX = 0;
@@ -28,16 +30,51 @@ public class MouseAndShader : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(onHold)
+        {
+            if (Input.GetAxis("Mouse X") > 0)
+            {
+                valX += 4 * Time.deltaTime;
+                material.SetFloat("_SignX", 1);
+            }
+            else if (Input.GetAxis("Mouse X") < 0)
+            {
+                valX -= 4 * Time.deltaTime;
+                material.SetFloat("_SignX", -1);
+            }
+            else
+            {
+                if (Approximate(valX, 0, 0.01f))
+                {
+                    valX = 0;
+                }
+                else
+                {
+                    valX = Mathf.Lerp(valX, 0, 4 * Time.deltaTime);
+                }
+            }
 
-        if (Input.GetAxis("Mouse X") > 0)
-        {
-            valX += 4 * Time.deltaTime;
-            material.SetFloat("_SignX", 1);
-        }
-        else if (Input.GetAxis("Mouse X") < 0)
-        {
-            valX -= 4 * Time.deltaTime;
-            material.SetFloat("_SignX", -1);
+            if(Input.GetAxis("Mouse Y") > 0)
+            {
+                valY += 4 * Time.deltaTime;
+                material.SetFloat("_SignY", 1);
+            }
+            else if (Input.GetAxis("Mouse Y") < 0)
+            {
+                valY -= 4 * Time.deltaTime;
+                material.SetFloat("_SignY", -1);
+            }
+            else
+            {
+                if (Approximate(valY, 0, 0.01f))
+                {
+                    valY = 0;
+                }
+                else
+                {
+                    valY = Mathf.Lerp(valY, 0, 4 * Time.deltaTime);
+                }
+            }
         }
         else
         {
@@ -49,20 +86,7 @@ public class MouseAndShader : MonoBehaviour
             {
                 valX = Mathf.Lerp(valX, 0, 4 * Time.deltaTime);
             }
-        }
 
-        if(Input.GetAxis("Mouse Y") > 0)
-        {
-            valY += 4 * Time.deltaTime;
-            material.SetFloat("_SignY", 1);
-        }
-        else if (Input.GetAxis("Mouse Y") < 0)
-        {
-            valY -= 4 * Time.deltaTime;
-            material.SetFloat("_SignY", -1);
-        }
-        else
-        {
             if (Approximate(valY, 0, 0.01f))
             {
                 valY = 0;
