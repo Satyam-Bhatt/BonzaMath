@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Unlit_StationaryBlock
-  m_Shader: {fileID: 4800000, guid: dc373acb7295be746995d5b747a495c0, type: 3}
+  m_Name: Unlit_WhyNotAnotherShader
+  m_Shader: {fileID: 4800000, guid: d4ff8c7e357bc2844afb6a2618fa89bc, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -24,19 +24,12 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 49d1e0ebb0e3f6c4da131acd09a3adf7, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex1:
-        m_Texture: {fileID: 2800000, guid: 54f1f4f042aabda46bc3e74e28bf83af, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex2:
-        m_Texture: {fileID: 2800000, guid: 54f1f4f042aabda46bc3e74e28bf83af, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
-    m_Floats: []
-    m_Colors:
-    - _Color: {r: 0.16936633, g: 0.16936633, b: 0.20754719, a: 1}
+    m_Floats:
+    - _Height: 0.92
+    - _Width: 1.66
+    m_Colors: []
   m_BuildTextureStacks: []
