@@ -82,12 +82,12 @@ public class OperatorCalculatingScript : MonoBehaviour
     {
         if (float.Parse(finalTotal) == GameManager.Instance.win_Total)
         {
-            totalText.text += "\n<color=orange>" + finalTotal + "</color><color=green><b>=" + GameManager.Instance.win_Total + "<b></color>";
+            //totalText.text += "\n<color=orange>" + finalTotal + "</color><color=green><b>=" + GameManager.Instance.win_Total + "<b></color>";
             winPanel.SetActive(true);
         }
         else
         {
-            totalText.text += "\n<color=#D97448>" + finalTotal + "</color><color=#7C0A02><b>≠" + GameManager.Instance.win_Total + "<b></color>";
+            //totalText.text += "\n<color=#D97448>" + finalTotal + "</color><color=#7C0A02><b>≠" + GameManager.Instance.win_Total + "<b></color>";
         }
     }
 

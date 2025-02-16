@@ -74,6 +74,19 @@ Shader "Unlit/WhyNotAnotherShader"
 
                 float3 col = palette(finalCreation + _Time.y * 0.2);
 
+                float2 uv2 = i.uv * 2 - 1;
+                
+                // Adjust UV based on aspect ratio
+                if (aspectRatio > 1.0) {
+                    uv2.x *= aspectRatio;
+                } else {
+                    uv2.y /= aspectRatio;
+                }
+                float clip = SDF_Box(uv2, float2(1.5, 0.85)) - 0.2;
+                clip = step(clip, 0);
+                if(clip == 0) discard;
+                //return clip;
+
                 return float4(col,1);
             }
             ENDCG
