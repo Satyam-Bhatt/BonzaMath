@@ -7,6 +7,7 @@ public class SlightMovement : MonoBehaviour
     [SerializeField] private Transform objectToMove;
     [SerializeField] private float offset_X;
     [SerializeField] private float offset_Y;
+    [SerializeField] private float speed;
 
     private Vector3 originalPosition;
     private void Start()
@@ -20,11 +21,11 @@ public class SlightMovement : MonoBehaviour
         float x, y;
         if (Input.GetAxis("Mouse Y") > 0)
         {
-            y = Mathf.Lerp(objectToMove.position.y, objectToMove.position.y + offset_Y, 4 * Time.deltaTime);
+            y = Mathf.Lerp(objectToMove.position.y, originalPosition.y + offset_Y, speed * Time.deltaTime);
         }
         else if (Input.GetAxis("Mouse Y") < 0)
         {
-            y = Mathf.Lerp(objectToMove.position.y, objectToMove.position.y - offset_Y, 4 * Time.deltaTime);
+            y = Mathf.Lerp(objectToMove.position.y, originalPosition.y - offset_Y, speed * Time.deltaTime);
         }
         else
         {
@@ -33,11 +34,11 @@ public class SlightMovement : MonoBehaviour
 
         if (Input.GetAxis("Mouse X") > 0)
         {
-            x = Mathf.Lerp(objectToMove.position.x, objectToMove.position.x + offset_X, 4 * Time.deltaTime);
+            x = Mathf.Lerp(objectToMove.position.x, originalPosition.x + offset_X, speed * Time.deltaTime);
         }
         else if (Input.GetAxis("Mouse X") < 0)
         {
-            x = Mathf.Lerp(objectToMove.position.x, objectToMove.position.x - offset_X, 4 * Time.deltaTime);
+            x = Mathf.Lerp(objectToMove.position.x, originalPosition.x - offset_X, speed * Time.deltaTime);
         }
         else
         {

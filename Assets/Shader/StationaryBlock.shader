@@ -129,7 +129,7 @@ Shader "Unlit/StationaryBlock"
                 float4 colTex2 = tex2D(_MainTex2, frag.uv);
 
                 float4 check = lerp(_Color, colTex + 0.8, effect);
-
+                check = check * 10;
                 return check * frag.color;
             }
 
