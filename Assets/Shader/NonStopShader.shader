@@ -10,7 +10,14 @@ Shader "Unlit/AspectRatioCorrectedShader"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags
+        {
+            "RenderType" = "Opaque"
+        }
+
+        ZTest[unity_GUIZTestMode]
+        Blend SrcAlpha OneMinusSrcAlpha
+
         Pass
         {
             CGPROGRAM
@@ -44,24 +51,32 @@ Shader "Unlit/AspectRatioCorrectedShader"
                 o.screenPosition = ComputeScreenPos(o.vertex);
                 return o;
             }
-
-            float3 palette_orange_red_pastel(in float t)
-            {
-                float3 a = float3(0.85, 0.55, 0.45);  // Enhanced peach/coral base
-                float3 b = float3(0.25, 0.15, 0.15);  // Reduced amplitude for softer waves
-                float3 c = float3(0.9, 0.7, 0.6);     // Adjusted frequency
-                float3 d = float3(0.2, 0.05, 0.1);    // Fine-tuned phase shift
-                return a + b*cos(6.28318*(c*t+d));
-            }
             
-            float3 palette_green_blue_pastel(in float t)
+            float3 palette( in float t)
             {
-                float3 a = float3(0.5, 0.65, 0.7);    // Adjusted mint base toward teal
-                float3 b = float3(0.2, 0.25, 0.25);   // Balanced amplitude
-                float3 c = float3(0.8, 0.7, 0.9);     // Adjusted frequency
-                float3 d = float3(0.3, 0.4, 0.5);     // Enhanced blue-green phase shift
+                float3 a = float3(0.6, 0.5, 0.6);
+                float3 b = float3(0.2, 0.2, 0.3);
+                float3 c = float3(0.8, 0.8, 0.8);
+                float3 d = float3(0.0, 0.1, 0.2);
+
+                return a + b*cos( 6.28318*(c*t+d) );
+            }
+
+            float3 palette_blue_peach_gradient(in float t)
+            {
+                // Convert hex colors to float3 (RGB in 0-1 range)
+                float3 color1 = float3(0.5019, 0.5647, 0.7372); // #8090BC
+                float3 color2 = float3(1.0, 0.9215, 0.7960);   // #FFEBCB
+    
+                // Create a smooth transition between colors
+                float3 a = (color1 + color2) * 0.5;            // Average as base
+                float3 b = (color2 - color1) * 0.5;            // Half the difference as amplitude
+                float3 c = float3(1.0, 1.0, 1.0);              // Uniform frequency
+                float3 d = float3(0.0, 0.0, 0.0);              // No phase shift
+    
                 return a + b*cos(6.28318*(c*t+d));
             }
+
             
             float Random(float2 uv)
             {
@@ -102,10 +117,12 @@ Shader "Unlit/AspectRatioCorrectedShader"
                 // Create a quantized version for the grid effect
                 float2 grid_uv = floor(continuous_uv);
                 
+                //return float4(palette_oceanic_depth(uv.x),1);
+
                 // Get palette colors with improved animation
                 float time = _Time.y * _Speed;
-                float3 col1 = palette_orange_red_pastel(grid_uv.y * 0.05 + time * 0.2);
-                float3 col2 = palette_green_blue_pastel(grid_uv.x * 0.05 + time * 0.15);
+                float3 col1 = palette(grid_uv.y * 0.05 + time * 0.2);
+                float3 col2 = palette_blue_peach_gradient(grid_uv.x * 0.05 + time * 0.15);
                 
                 // Get random value with smoother animation
                 float ran = RandomWithMovement(grid_uv);
@@ -113,15 +130,11 @@ Shader "Unlit/AspectRatioCorrectedShader"
                 // Smooth the transition between colors
                 float blend = smoothstep(0.0, _BlendSmoothing, ran) * 
                              smoothstep(1.0, 1.0 - _BlendSmoothing, ran);
+
                 float lerpFactor = lerp(ran, blend, 0.7);
                 
                 // Create final color with improved blending
                 float3 colMain = lerp(col1, col2, lerpFactor);
-                
-                // Add subtle vignette effect
-                float2 center = uv - 0.5;
-                float vignette = 1.0 - dot(center, center) * 0.5;
-                colMain *= vignette;
                 
                 return float4(colMain, 1);
             }
