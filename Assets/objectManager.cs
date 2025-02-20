@@ -136,7 +136,7 @@ public class objectManager : MonoBehaviour
                 {
                     b.boundingBox.storedObject.Add(hitObject);
                     b.boundingBox.RecalculateNumber_OnRelease();
-                    b.boundingBox.ChangeColor(Color.black); //Color when the cell is occupied
+                    b.boundingBox.ChangeColor(new Color(0.78f, 0.18f, 0.09f)); //Color when the cell is occupied
                 }
             }
 
@@ -156,7 +156,7 @@ public class objectManager : MonoBehaviour
         {
             foreach (BoundingBoxWithTile box in boxesToHighlight)
             {
-                box.boundingBox.ChangeColor(Color.yellow);
+                box.boundingBox.ChangeColor(new Color(0.85f, 0.74f, 0.15f));
             }
 
             //Distance Check
@@ -217,8 +217,16 @@ public class objectManager : MonoBehaviour
     //Resets all the main objects to 0 on Z axis
     private void ResetZPosition()
     {
-        if(hitObject == null) return;
-        hitObject.transform.position = new Vector3(hitObject.transform.position.x, hitObject.transform.position.y, -2);
+        if (hitObject == null)
+        {
+            Debug.Log("Abhla");
+            return;
+        }
+        else
+        {
+            Debug.Log("Satyam");
+            hitObject.transform.position = new Vector3(hitObject.transform.position.x, hitObject.transform.position.y, -2);
+        }
 
         //GameObject[] mainObjects = GameObject.FindGameObjectsWithTag("MainObject");
         //int objectsStoringOtherObjects = 1;
@@ -283,7 +291,7 @@ public class objectManager : MonoBehaviour
 
     private void AttachToMouse(GameObject gameObj)
     {
-        gameObj.transform.position = new Vector3(mousePosition_.x, mousePosition_.y, _zValueForObject);
+        gameObj.transform.position = new Vector3(mousePosition_.x, mousePosition_.y, -2);
     }
 }
 

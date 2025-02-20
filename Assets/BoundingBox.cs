@@ -56,7 +56,7 @@ public class BoundingBox : MonoBehaviour
     {
         if (storedObject.Count > 0)
         {
-            ChangeColor(Color.black);
+            ChangeColor(new Color(0.78f, 0.18f, 0.09f));
         }
         else
         {
@@ -81,7 +81,12 @@ public class BoundingBox : MonoBehaviour
 
     public void ColorChange()
     {
-        ChangeColor(storedObject.Count > 0 ? Color.black : Color.white);
+        ChangeColor(storedObject.Count > 0 ? new Color(0.78f, 0.18f, 0.09f) : Color.white);
+    }
+
+    private void ChangeColor(object value)
+    {
+        throw new NotImplementedException();
     }
 
     public void RecalculateNumber_OnRelease()
@@ -104,8 +109,11 @@ public class BoundingBox : MonoBehaviour
         float depth = - 0.1f;
         foreach(GameObject g in storedObject)
         {
-            Debug.Log(depth + " name" + g.name);
-            g.transform.position = new Vector3(g.transform.position.x, g.transform.position.y, depth);
+            //Debug.Log(depth + " name" + g.name);
+            if(depth < g.transform.position.z)
+            {
+                g.transform.position = new Vector3(g.transform.position.x, g.transform.position.y, depth);
+            }
             depth -= 0.1f;
             
         }
