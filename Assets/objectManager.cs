@@ -217,26 +217,29 @@ public class objectManager : MonoBehaviour
     //Resets all the main objects to 0 on Z axis
     private void ResetZPosition()
     {
-        GameObject[] mainObjects = GameObject.FindGameObjectsWithTag("MainObject");
-        int objectsStoringOtherObjects = 1;
-        foreach (GameObject mO in mainObjects)
-        {
-            if (mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum == null)
-            {
-                mO.transform.position = new Vector3(mO.transform.position.x, mO.transform.position.y, 0);
-            }
-            else if (mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum != null)
-            {
-                objectsStoringOtherObjects++;
-            }
-        }
+        if(hitObject == null) return;
+        hitObject.transform.position = new Vector3(hitObject.transform.position.x, hitObject.transform.position.y, -2);
 
-        _zValueForObject = objectsStoringOtherObjects switch
-        {
-            1 => -0.1f,
-            > 1 => -0.1f * objectsStoringOtherObjects,
-            _ => _zValueForObject
-        };
+        //GameObject[] mainObjects = GameObject.FindGameObjectsWithTag("MainObject");
+        //int objectsStoringOtherObjects = 1;
+        //foreach (GameObject mO in mainObjects)
+        //{
+        //    if (mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum == null)
+        //    {
+        //        mO.transform.position = new Vector3(mO.transform.position.x, mO.transform.position.y, 0);
+        //    }
+        //    else if (mO.GetComponentInChildren<boxDetection>() != null && mO.GetComponentInChildren<boxDetection>().colliderNum != null)
+        //    {
+        //        objectsStoringOtherObjects++;
+        //    }
+        //}
+
+        //_zValueForObject = objectsStoringOtherObjects switch
+        //{
+        //    1 => -0.1f,
+        //    > 1 => -0.1f * objectsStoringOtherObjects,
+        //    _ => _zValueForObject
+        //};
     }
 
     private void RotateLeft(GameObject gameObj)

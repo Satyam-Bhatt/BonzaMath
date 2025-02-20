@@ -87,6 +87,7 @@ public class BoundingBox : MonoBehaviour
     public void RecalculateNumber_OnRelease()
     {
         RecalculateNumber();
+        RearrangeTheDepth();
     }
 
     public void RecalculateNumber_OnClick(GameObject objectParent)
@@ -94,6 +95,20 @@ public class BoundingBox : MonoBehaviour
         if (storedObject.Count > 0) storedObject.Remove(objectParent);
 
         RecalculateNumber();
+    }
+
+    private void RearrangeTheDepth()
+    {
+        if (storedObject.Count == 0) return;
+
+        float depth = - 0.1f;
+        foreach(GameObject g in storedObject)
+        {
+            Debug.Log(depth + " name" + g.name);
+            g.transform.position = new Vector3(g.transform.position.x, g.transform.position.y, depth);
+            depth -= 0.1f;
+            
+        }
     }
 
     //Loop through the boxes and then calculate the total. It does not Follow DMAS so we take 2 boxes at a time calculate the number and then move to the upper one
