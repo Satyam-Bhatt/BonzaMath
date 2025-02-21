@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4712870742418553149}
   m_Layer: 0
   m_Name: Shader_Multiply
-  m_TagString: Untagged
+  m_TagString: ChildObject
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

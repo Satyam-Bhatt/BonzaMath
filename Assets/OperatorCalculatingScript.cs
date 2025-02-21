@@ -127,7 +127,7 @@ public class OperatorCalculatingScript : MonoBehaviour
             }
         }
     }
-    
+
     //Updates the text on top but after some small delay. This is done so that that boxes are added
     private IEnumerator DelayedUpdate()
     {

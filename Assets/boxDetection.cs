@@ -57,6 +57,7 @@ public class boxDetection : MonoBehaviour
         {
             if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
             {
+                collidedText = h.collider.gameObject.GetComponentInChildren<TMP_Text>().text;
                 colliderNum = h.collider.gameObject.GetComponentInChildren<TMP_Text>();
 
                 colliderNum.text = "";
