@@ -41,6 +41,33 @@ public class boxDetection : MonoBehaviour
         originalText = myNumber.text;
         IsInBoundingBox = BoundingBoxCheckRay();
         PositionOfParent = transform.parent.position;
+
+        transform.localScale = new Vector3(0, 0, 0);
+        StartCoroutine(ScaleUp());
+    }
+
+    private IEnumerator ScaleUp()
+    {
+        float duration = 2f;
+        float targetScale = 40f;
+        float elapsedTime = 0f;
+
+        Vector3 startScale = transform.localScale;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration;
+
+            float d = 2f;
+            float progress = (float)(Mathf.Pow(2, -10 * t) * Mathf.Sin((t * d - 0.075f) * (2 * Mathf.PI) / 0.3f) + 1);
+            float scale = targetScale * progress;
+
+            transform.localScale = new Vector3(scale, scale, scale);
+            yield return null;
+        }
+
+        transform.localScale = new Vector3(targetScale, targetScale, targetScale);
     }
 
     //Called when the mouse button is released
