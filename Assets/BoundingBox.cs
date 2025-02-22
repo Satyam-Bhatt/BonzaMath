@@ -74,7 +74,7 @@ public class BoundingBox : MonoBehaviour
             if (h.collider != null && h.collider.gameObject.tag == "ChildObject" && h.collider.gameObject != this.gameObject)
             {
                 storedObject.Add(h.collider.transform.parent.gameObject);
-                ChangeColor(Color.black);
+                ChangeColor(new Color(0.78f, 0.18f, 0.09f));
             }
         }
     }
@@ -82,11 +82,6 @@ public class BoundingBox : MonoBehaviour
     public void ColorChange()
     {
         ChangeColor(storedObject.Count > 0 ? new Color(0.78f, 0.18f, 0.09f) : Color.white);
-    }
-
-    private void ChangeColor(object value)
-    {
-        throw new NotImplementedException();
     }
 
     public void RecalculateNumber_OnRelease()

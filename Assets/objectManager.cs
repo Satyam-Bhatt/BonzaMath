@@ -219,12 +219,10 @@ public class objectManager : MonoBehaviour
     {
         if (hitObject == null)
         {
-            Debug.Log("Abhla");
             return;
         }
         else
         {
-            Debug.Log("Satyam");
             hitObject.transform.position = new Vector3(hitObject.transform.position.x, hitObject.transform.position.y, -2);
         }
 
