@@ -16,6 +16,9 @@ public class OperatorCalculatingScript : MonoBehaviour
     //-----------------WIN PANEL-----------------
     [SerializeField] private GameObject winPanel;
 
+    //-----------------GAME COMPLETE PANEL-----------------
+    [SerializeField] private GameObject gameCompletePanel;
+
     //-----------------OBJECTIVE TEXT--------------
     [SerializeField] private TMP_Text objectiveNumber;
     
@@ -39,6 +42,7 @@ public class OperatorCalculatingScript : MonoBehaviour
     {
         boxDetection_Components = FindObjectsOfType<boxDetection>();
         winPanel.SetActive(false);
+        gameCompletePanel.SetActive(false);
         objectiveNumber.text = GameManager.Instance.win_Total.ToString();
         StartCoroutine(DelayedUpdate());
     }
@@ -84,7 +88,14 @@ public class OperatorCalculatingScript : MonoBehaviour
         if (float.Parse(finalTotal) == GameManager.Instance.win_Total)
         {
             //totalText.text += "\n<color=orange>" + finalTotal + "</color><color=green><b>=" + GameManager.Instance.win_Total + "<b></color>";
-            winPanel.SetActive(true);
+            if(SceneManager.GetActiveScene().buildIndex == SceneManager.sceneCountInBuildSettings - 1)
+            {
+                gameCompletePanel.SetActive(true);
+            }
+            else
+            {
+                winPanel.SetActive(true);
+            }
         }
         else
         {
