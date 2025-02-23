@@ -154,5 +154,10 @@ public class OperatorCalculatingScript : MonoBehaviour
         currentSceneIndex++;
         levelNumber.text = currentSceneIndex.ToString();
     }
+
+    public void MuteToggle(bool state)
+    {
+        AudioManager.Instance.MuteAudio(state);
+    }
 }
 

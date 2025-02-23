@@ -86,6 +86,9 @@ public class objectManager : MonoBehaviour
                         bD.GetComponent<MouseAndShader>().onHold = true;
                     }
 
+                    //Play pick sound
+                    AudioManager.Instance.Pickup();
+
                     break;
                 }
             }
@@ -145,6 +148,9 @@ public class objectManager : MonoBehaviour
             boxesToHighlight.Clear();
 
             hitObject = null;
+
+            //Play place sound
+            AudioManager.Instance.Place();
         }
     }
 
@@ -224,6 +230,7 @@ public class objectManager : MonoBehaviour
         else
         {
             hitObject.transform.position = new Vector3(hitObject.transform.position.x, hitObject.transform.position.y, -2);
+            GameManager.Instance.tutorialState = false;
         }
 
         //GameObject[] mainObjects = GameObject.FindGameObjectsWithTag("MainObject");

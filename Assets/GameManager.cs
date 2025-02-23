@@ -21,4 +21,5 @@ public class GameManager : MonoBehaviour
     }
 
     [field:SerializeField] public int win_Total { get; private set; } = 0;
+    public bool tutorialState = false;
 }
