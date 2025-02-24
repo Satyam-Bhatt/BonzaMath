@@ -29,7 +29,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _GridSize: 1.93
-    - _SphereRadius: 0.36
+    - _GridSize: 1.66
+    - _SphereRadius: 0.4
+    - _value: 1.54
+    - _value1: 2
+    - _value2: 1
+    - _value3: 2.32
     m_Colors: []
   m_BuildTextureStacks: []

@@ -3,6 +3,9 @@ Shader "Unlit/Infinite3DCubes"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _value1("Value1" , Float) = 0
+        _value2("Value2" , Float) = 0
+        _value3("Value3" , Float) = 0
     }
     SubShader
     {
@@ -36,6 +39,7 @@ Shader "Unlit/Infinite3DCubes"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            float _value1, _value2, _value3;
 
             v2f vert (appdata v)
             {
@@ -50,24 +54,45 @@ Shader "Unlit/Infinite3DCubes"
                 return x - y * floor(x/y);
             }
 
+            float2 ModOperator(float2 x, float y)
+            {
+                return x - y * floor(x/y);
+            }
+
+            float ModOperator(float x, float y)
+            {
+                return x - y * floor(x/y);
+            }
+
             float GetDist(float3 position)
             {
                 float distanceToPlane = position.y;
 
-                float3 spherePosition = float3(1,1,1);
-                float radius = 0.5;
+                float3 spherePosition = float3(0,0,0);
+                float radius = 0.4;
 
-                float3 repeat = ModOperator(position, 2);
+                //position.y += sin(_Time.y);//Movement but camera Movemenet is a bit better
+
+                float3 repeat  = position;
+                //repeat = ModOperator(position, 2) - 1;//Repeats in all planes
+                //Comment one out to repeat in specific plane
+                repeat.x = ModOperator(position.x, _value1) - 1;
+                repeat.z = ModOperator(position.z, _value2) - 1;
+                repeat.y = ModOperator(position.y, _value3) - 1;
+                
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
 
-				return min(distanceToPlane, sphereDistance);
+                return sphereDistance;
+
+				//return min(distanceToPlane, sphereDistance);
             }
 
-            float RayMarch(float3 rayOrigin, float3 rayDirection)
+            float RayMarch(float3 rayOrigin, float3 rayDirection, out int val)
             {
                 float distanceOrigin = 0;
-                for(int i = 0; i < STEPS; i++)
+                int i;
+                for(i = 0; i < STEPS; i++)
                 {
                     float3 firstPointOfContact = rayOrigin + distanceOrigin * rayDirection;
 
@@ -76,7 +101,7 @@ Shader "Unlit/Infinite3DCubes"
 
                     if(distanceOrigin > MAXDIST || distanceToTheObject < MINDIST) break;
                 }
-
+                val = i;
                 return distanceOrigin;
             }
 
@@ -101,9 +126,9 @@ Shader "Unlit/Infinite3DCubes"
                 float3 normal = GetNormal(position);
                 float diffuseLight = saturate(dot(lightVector, normal));
 
-                //Shadow
-                float shadowToLight = RayMarch(position + normal * SURF_DIST, lightPosition);
-                if(shadowToLight < length(lightPosition - position)) diffuseLight = diffuseLight * 0.2;
+                //Shadow - Turned off becaue of artifacting
+                //float shadowToLight = RayMarch(position + normal * SURF_DIST, lightPosition);
+                //if(shadowToLight < length(lightPosition - position)) diffuseLight = diffuseLight;
 
                 return diffuseLight;
             }
@@ -123,19 +148,21 @@ Shader "Unlit/Infinite3DCubes"
                 float2 uv = i.uv * 2 - 1; //Center the scene
                 uv.x = uv.x * 0.8/1;
 
-                float3 rayOrigin  = float3(0,1,-3);
+               //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
+                float3 rayOrigin  = float3(0,1,-3); //Camera Movemenet
                 float3 rayDirection = normalize(float3(uv,1));
 
-                float col = RayMarch(rayOrigin, rayDirection);
-
+                int val = 0;
+                float col = RayMarch(rayOrigin, rayDirection, val);
+                
                 float3 pointForLight = rayOrigin + col * rayDirection;
                 float diffuseLight = GetLight(pointForLight);
 
-                return diffuseLight;
+                return float4(diffuseLight.xxx, 1.0);
 
-                col  = col/8;
+                //col  = col/8;
                 
-                return col;
+                //return col;
             }
             ENDCG
         }
