@@ -34,7 +34,7 @@ Material:
     - _SphereRadius: 0.4
     - _value: 1.54
     - _value1: 2
-    - _value2: 1.04
+    - _value2: 2
     - _value3: 2
     m_Colors: []
   m_BuildTextureStacks: []

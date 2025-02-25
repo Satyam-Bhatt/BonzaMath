@@ -88,13 +88,14 @@ Shader "Unlit/Infinite3DCubes"
                 position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
                 position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
 
+                //position  = position * float3(1,1,0.8);//Scaling
+
                 float3 repeat  = position;
                 //repeat = ModOperator(position, 2) - 1;//Repeats in all planes
                 //Comment one out to repeat in specific plane
                 repeat.x = ModOperator(position.x, _value1) - 1;
                 repeat.z = ModOperator(position.z, _value2) - 1;
-                repeat.y = ModOperator(position.y, _value3) - 1;
-                
+                //repeat.y = ModOperator(position.y, _value3) - 1;
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
 
@@ -110,6 +111,10 @@ Shader "Unlit/Infinite3DCubes"
                 for(i = 0; i < STEPS; i++)
                 {
                     float3 firstPointOfContact = rayOrigin + distanceOrigin * rayDirection;
+
+                    firstPointOfContact.xy = mul(firstPointOfContact.xy, Rotation(_Time.y + distanceOrigin * 0.1));
+        
+                    //firstPointOfContact.y += sin(distanceOrigin * (_value3 + 1.0) * 0.5) * 0.35;
 
                     float distanceToTheObject = GetDist(firstPointOfContact);
                     distanceOrigin += distanceToTheObject;
@@ -165,11 +170,13 @@ Shader "Unlit/Infinite3DCubes"
                 uv.x = uv.x * 0.8/1;
 
                //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
-               float3 rayOrigin  = float3(0,1,-3); //Camera Movemenet
+               float3 rayOrigin  = float3(0,0,-3); //Camera Movemenet
                float3 rayDirection = normalize(float3(uv,1));
 
                int val = 0;
                float col = RayMarch(rayOrigin, rayDirection, val);
+
+               //return col/8;
 
                //fog
                float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //if we don't covert then the int division the result is truncated. This value also controls the strength of fog
