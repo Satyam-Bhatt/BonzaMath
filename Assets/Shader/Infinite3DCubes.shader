@@ -6,6 +6,7 @@ Shader "Unlit/Infinite3DCubes"
         _value1("Value1" , Float) = 0
         _value2("Value2" , Float) = 0
         _value3("Value3" , Float) = 0
+        _FogStr("fogstr" , Float) = 0
     }
     SubShader
     {
@@ -39,7 +40,7 @@ Shader "Unlit/Infinite3DCubes"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            float _value1, _value2, _value3;
+            float _value1, _value2, _value3, _FogStr;
 
             v2f vert (appdata v)
             {
@@ -47,6 +48,13 @@ Shader "Unlit/Infinite3DCubes"
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
                 return o;
+            }
+
+            float2x2 Rotation(float angle)
+            {
+				float s = sin(angle);
+				float c = cos(angle);
+				return float2x2(c, -s, s, c);
             }
 
             float3 ModOperator(float3 x, float y)
@@ -71,7 +79,14 @@ Shader "Unlit/Infinite3DCubes"
                 float3 spherePosition = float3(0,0,0);
                 float radius = 0.4;
 
-                //position.y += sin(_Time.y);//Movement but camera Movemenet is a bit better
+                float originalZ = position.z + (_Time.y);
+
+                position.z += (_Time.y);//Movement but camera Movemenet is a bit better
+
+                //Apply sin wave to the y component
+				//position.y += 0.8 * sin(position.z * 0.5); // No Movemenet
+                position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
+                position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
 
                 float3 repeat  = position;
                 //repeat = ModOperator(position, 2) - 1;//Repeats in all planes
@@ -127,8 +142,9 @@ Shader "Unlit/Infinite3DCubes"
                 float diffuseLight = saturate(dot(lightVector, normal));
 
                 //Shadow - Turned off becaue of artifacting
-                //float shadowToLight = RayMarch(position + normal * SURF_DIST, lightPosition);
-                //if(shadowToLight < length(lightPosition - position)) diffuseLight = diffuseLight;
+                // int val = 0;
+                // float shadowToLight = RayMarch(position + normal * SURF_DIST, lightPosition, val);
+                // if(shadowToLight < length(lightPosition - position)) diffuseLight = diffuseLight * 0.1;
 
                 return diffuseLight;
             }
@@ -149,20 +165,27 @@ Shader "Unlit/Infinite3DCubes"
                 uv.x = uv.x * 0.8/1;
 
                //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
-                float3 rayOrigin  = float3(0,1,-3); //Camera Movemenet
-                float3 rayDirection = normalize(float3(uv,1));
+               float3 rayOrigin  = float3(0,1,-3); //Camera Movemenet
+               float3 rayDirection = normalize(float3(uv,1));
 
-                int val = 0;
-                float col = RayMarch(rayOrigin, rayDirection, val);
+               int val = 0;
+               float col = RayMarch(rayOrigin, rayDirection, val);
+
+               //fog
+               float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //if we don't covert then the int division the result is truncated. This value also controls the strength of fog
+
+               float3 fogColor = float3(0.5, 0.6, 0.7);
                 
-                float3 pointForLight = rayOrigin + col * rayDirection;
-                float diffuseLight = GetLight(pointForLight);
+               float3 pointForLight = rayOrigin + col * rayDirection;
+               float diffuseLight = GetLight(pointForLight);
 
-                return float4(diffuseLight.xxx, 1.0);
+               float3 finalCol = lerp( diffuseLight,fogColor, fogDepth);
 
-                //col  = col/8;
+               return float4(finalCol, 1.0);
+
+               //col  = col/8;
                 
-                //return col;
+               //return col;
             }
             ENDCG
         }
