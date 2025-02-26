@@ -1,4 +1,4 @@
-Shader "Unlit/Infinite3DCubes"
+Shader "Unlit/Confuse"
 {
     Properties
     {
@@ -19,7 +19,7 @@ Shader "Unlit/Infinite3DCubes"
             #pragma vertex vert
             #pragma fragment frag
 
-            #define STEPS 100
+            #define STEPS 200
             #define MAXDIST 100
             #define MINDIST 0.001
             #define SURF_DIST 1
@@ -57,21 +57,6 @@ Shader "Unlit/Infinite3DCubes"
 				return float2x2(c, -s, s, c);
             }
 
-            float3 ModOperator(float3 x, float y)
-            {
-                return x - y * floor(x/y);
-            }
-
-            float2 ModOperator(float2 x, float y)
-            {
-                return x - y * floor(x/y);
-            }
-
-            float ModOperator(float x, float y)
-            {
-                return x - y * floor(x/y);
-            }
-
             float GetDist(float3 position)
             {
                 float distanceToPlane = position.y;
@@ -83,28 +68,6 @@ Shader "Unlit/Infinite3DCubes"
 
                 float testSphere = length(position - spherePosition) - radius;
                 return testSphere;
-
-                position.z += (_Time.y);//Movement but camera Movemenet is a bit better
-
-                //Apply sin wave to the y component
-				//position.y += 0.8 * sin(position.z * 0.5); // No Movemenet
-                position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
-                position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
-
-                //position  = position * float3(1,1,0.8);//Scaling
-
-                float3 repeat  = position;
-                //repeat = ModOperator(position, 2) - 1;//Repeats in all planes
-                //Comment one out to repeat in specific plane
-                repeat.x = ModOperator(position.x, _value1) - 1;
-                repeat.z = ModOperator(position.z, _value2) - 1;
-                //repeat.y = ModOperator(position.y, _value3) - 1;
-
-                float sphereDistance = length(repeat - spherePosition) - radius;
-
-                return sphereDistance;
-
-				//return min(distanceToPlane, sphereDistance);
             }
 
             float RayMarch(float3 rayOrigin, float3 rayDirection, out int val)
@@ -114,10 +77,6 @@ Shader "Unlit/Infinite3DCubes"
                 for(i = 0; i < STEPS; i++)
                 {
                     float3 firstPointOfContact = rayOrigin + distanceOrigin * rayDirection;
-
-                    //firstPointOfContact.xy = mul(firstPointOfContact.xy, Rotation(_Time.y + distanceOrigin * 0.1));
-        
-                    //firstPointOfContact.y += sin(distanceOrigin * (_value3 + 1.0) * 0.5) * 0.35;
 
                     float distanceToTheObject = GetDist(firstPointOfContact);
                     distanceOrigin += distanceToTheObject;
@@ -149,17 +108,18 @@ Shader "Unlit/Infinite3DCubes"
                 float3 normal = GetNormal(position);
                 float diffuseLight = saturate(dot(lightVector, normal));
 
-                //Shadow - Turned off becaue of artifacting
-                // int val = 0;
-                // float shadowToLight = RayMarch(position + normal * SURF_DIST, lightPosition, val);
-                // if(shadowToLight < length(lightPosition - position)) diffuseLight = diffuseLight * 0.1;
-
                 return diffuseLight;
             }
 
             float Random(float2 uv)
             {
                 return frac(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453123);
+            }
+
+            float Dither(float3 color, float2 uv)
+            {
+                float dither = Random(uv) * 0.03 - 0.015; // Small random offset
+                return dither;
             }
 
             float RandomWithMovement(float2 uv)
@@ -179,23 +139,22 @@ Shader "Unlit/Infinite3DCubes"
                int val = 0;
                float col = RayMarch(rayOrigin, rayDirection, val);
 
-               //return col/8;
-
-               //fog
-               float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //if we don't covert then the int division the result is truncated. This value also controls the strength of fog
 
                float3 fogColor = float3(0.5, 0.6, 0.7);
+
+               float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //if we don't covert then the int division the result is truncated. This value also controls the strength of fog
+               float fogstrength = saturate(MAXDIST/STEPS) + 0.2;
+               float other = max(fogDepth, fogstrength);
+
+               //return other;
                 
                float3 pointForLight = rayOrigin + col * rayDirection;
                float diffuseLight = GetLight(pointForLight);
 
-               float3 finalCol = lerp( diffuseLight,fogColor, fogDepth);
+               float3 finalCol = lerp( diffuseLight,fogColor, other);
 
                return float4(finalCol, 1.0);
 
-               //col  = col/8;
-                
-               //return col;
             }
             ENDCG
         }
