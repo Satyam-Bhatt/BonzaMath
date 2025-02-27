@@ -57,17 +57,33 @@ Shader "Unlit/Confuse"
 				return float2x2(c, -s, s, c);
             }
 
+            float3 ModOperator(float3 x, float y)
+            {
+                return x - y * floor(x/y);
+            }
+
             float GetDist(float3 position)
             {
                 float distanceToPlane = position.y;
 
-                float3 spherePosition = float3(0,0,0);
+                float3 spherePosition = float3(0,0,1);
                 float radius = 0.4;
 
                 float originalZ = position.z + (_Time.y);
 
                 float testSphere = length(position - spherePosition) - radius;
-                return testSphere;
+
+                float3 repeat  = position;
+
+                position.xy = mul(position.xy, Rotation(_Time.y + position.z * 0.1));
+
+                repeat = ModOperator(position, 2) - 1;//Repeats in all planes
+
+                float sphereDistance = length(repeat - spherePosition) - radius;
+
+                return sphereDistance;
+
+				//return min(distanceToPlane, sphereDistance);
             }
 
             float RayMarch(float3 rayOrigin, float3 rayDirection, out int val)
@@ -103,7 +119,7 @@ Shader "Unlit/Confuse"
 
             float GetLight(float3 position)
             {
-                float3 lightPosition = float3(2,3,-2);
+                float3 lightPosition = float3(0,0,-5);
                 float3 lightVector = normalize(lightPosition - position);
                 float3 normal = GetNormal(position);
                 float diffuseLight = saturate(dot(lightVector, normal));
@@ -144,29 +160,14 @@ Shader "Unlit/Confuse"
                int val = 0;
                float col = RayMarch(rayOrigin, rayDirection, val);
 
-
-               float3 fogColor = float3(0.5, 0.6, 0.7);
-
-               float fogDepth = saturate(float(val)/float(100) * _FogStr) ; //Gives Halo Ring but background is banded
-               float fogstrength = saturate(col/float(MAXDIST));//Giver perfect mask for sphere
-               float something = float3(0.2,0.2,0.2);
-               float other = max(fogDepth, something);
-               float inverseFogStr = 1 - fogstrength;
-               float needed =  inverseFogStr + other;
-               float lerpp = InverseLerp(0.25, 1, needed);//Center gradient white and black rest
-               float trueMask =  step(0.1, fogstrength) * lerpp;
-                
                float3 pointForLight = rayOrigin + col * rayDirection;
                float diffuseLight = GetLight(pointForLight);//Sphere with black background
 
-               float3 finalCol = lerp( diffuseLight,fogColor, fogstrength);
-
-               float3 letsGo = lerp(finalCol + fogColor/15, float3(1,1,1) * 2, trueMask);
-
-               return float4(letsGo, 1.0);
+               return diffuseLight;
 
             }
             ENDCG
         }
     }
+    //https://www.shadertoy.com/view/3sfczH
 }

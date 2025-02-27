@@ -87,10 +87,13 @@ Shader "Unlit/Infinite3DCubes"
 
                 position.z += (_Time.y);//Movement but camera Movemenet is a bit better
 
+                //Spiral Rotation
+                position.xy = mul(position.xy, Rotation(originalZ * 0.1));
+
                 //Apply sin wave to the y component
 				//position.y += 0.8 * sin(position.z * 0.5); // No Movemenet
-                position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
-                position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
+                //position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
+                //position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
 
                 //position  = position * float3(1,1,0.8);//Scaling
 
@@ -99,7 +102,7 @@ Shader "Unlit/Infinite3DCubes"
                 //Comment one out to repeat in specific plane
                 repeat.x = ModOperator(position.x, _value1) - 1;
                 repeat.z = ModOperator(position.z, _value2) - 1;
-                //repeat.y = ModOperator(position.y, _value3) - 1;
+                repeat.y = ModOperator(position.y, _value3) - 1;
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
 
@@ -145,7 +148,7 @@ Shader "Unlit/Infinite3DCubes"
 
             float GetLight(float3 position)
             {
-                float3 lightPosition = float3(2,3,-2);
+                float3 lightPosition = float3(0,5,-3);
                 float3 lightVector = normalize(lightPosition - position);
                 float3 normal = GetNormal(position);
                 float diffuseLight = saturate(dot(lightVector, normal));
@@ -179,7 +182,7 @@ Shader "Unlit/Infinite3DCubes"
                 uv.x = uv.x * 0.8/1;
 
                //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
-               float3 rayOrigin  = float3(0,0,-3); //Camera Movemenet
+               float3 rayOrigin  = float3(0,2,-3); //Camera Movemenet
                float3 rayDirection = normalize(float3(uv.x, uv.y,1));
 
                int val = 0;
@@ -189,7 +192,7 @@ Shader "Unlit/Infinite3DCubes"
                float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //Creates Halo but the background is banded
                float greyCol = float3(0.2,0.2,0.2);
                float removeBanding = max(fogDepth, greyCol); //Removed circular bands in the background also maintins the Halo
-               float diffuseMask = saturate(col/float(MAXDIST)); //Giver perfect mask for sphere
+               float diffuseMask = saturate(col/float(MAXDIST/4)); //Giver perfect mask for sphere
                float inverseDiffuseMask = 1 - diffuseMask; //White sphere and rest is black
                float maskWithHalo = inverseDiffuseMask + removeBanding; //Center gradient white and grey rest
                float maskForDiffuseHalo = InverseLerp(0.2, 1, maskWithHalo); //Center gradient white and black rest
@@ -198,7 +201,9 @@ Shader "Unlit/Infinite3DCubes"
                float3 pointForLight = rayOrigin + col * rayDirection;
                float diffuseLight = GetLight(pointForLight);
 
+
                float3 finalCol = lerp( diffuseLight,_FogColor, diffuseMask);
+               return float4 (finalCol, 1);
                float3 finalColWithHalo = lerp( finalCol + _FogColor/5,1, maskForHalo);
 
                float3 haloColor = maskForHalo * _FogColor * 5;
