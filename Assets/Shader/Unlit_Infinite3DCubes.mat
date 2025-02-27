@@ -36,5 +36,6 @@ Material:
     - _value1: 2
     - _value2: 2
     - _value3: 2
-    m_Colors: []
+    m_Colors:
+    - _FogColor: {r: 0.3794055, g: 0.46328765, b: 0.5471698, a: 1}
   m_BuildTextureStacks: []

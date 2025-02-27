@@ -7,6 +7,7 @@ Shader "Unlit/Infinite3DCubes"
         _value2("Value2" , Float) = 0
         _value3("Value3" , Float) = 0
         _FogStr("fogstr" , Float) = 0
+        _FogColor("FogColor", Color) = (0.5, 0.6, 0.7, 1)
     }
     SubShader
     {
@@ -19,7 +20,7 @@ Shader "Unlit/Infinite3DCubes"
             #pragma vertex vert
             #pragma fragment frag
 
-            #define STEPS 100
+            #define STEPS 200
             #define MAXDIST 100
             #define MINDIST 0.001
             #define SURF_DIST 1
@@ -39,7 +40,7 @@ Shader "Unlit/Infinite3DCubes"
             };
 
             sampler2D _MainTex;
-            float4 _MainTex_ST;
+            float4 _MainTex_ST, _FogColor;
             float _value1, _value2, _value3, _FogStr;
 
             v2f vert (appdata v)
@@ -167,6 +168,11 @@ Shader "Unlit/Infinite3DCubes"
                 return sin(_Time.y * 0.5 + Random(uv) * 10) * 0.5 + 0.5;
             }
 
+            float InverseLerp(float a, float b , float v)
+            {
+                return clamp((v - a) / (b - a), 0, 1);
+            }
+
             float4 frag (v2f i) : SV_Target
             {
                 float2 uv = i.uv * 2 - 1; //Center the scene
@@ -179,19 +185,26 @@ Shader "Unlit/Infinite3DCubes"
                int val = 0;
                float col = RayMarch(rayOrigin, rayDirection, val);
 
-               //return col/8;
-
-               //fog
-               float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //if we don't covert then the int division the result is truncated. This value also controls the strength of fog
-
-               float3 fogColor = float3(0.5, 0.6, 0.7);
+               //if we don't covert to float then the int division result is truncated.
+               float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //Creates Halo but the background is banded
+               float greyCol = float3(0.2,0.2,0.2);
+               float removeBanding = max(fogDepth, greyCol); //Removed circular bands in the background also maintins the Halo
+               float diffuseMask = saturate(col/float(MAXDIST)); //Giver perfect mask for sphere
+               float inverseDiffuseMask = 1 - diffuseMask; //White sphere and rest is black
+               float maskWithHalo = inverseDiffuseMask + removeBanding; //Center gradient white and grey rest
+               float maskForDiffuseHalo = InverseLerp(0.2, 1, maskWithHalo); //Center gradient white and black rest
+               float maskForHalo = step(0.1, diffuseMask) * maskForDiffuseHalo; //Sphere and background is black but halo is white. Can be used for halo color
                 
                float3 pointForLight = rayOrigin + col * rayDirection;
                float diffuseLight = GetLight(pointForLight);
 
-               float3 finalCol = lerp( diffuseLight,fogColor, fogDepth);
+               float3 finalCol = lerp( diffuseLight,_FogColor, diffuseMask);
+               float3 finalColWithHalo = lerp( finalCol + _FogColor/5,1, maskForHalo);
 
-               return float4(finalCol, 1.0);
+               float3 haloColor = maskForHalo * _FogColor * 5;
+
+               //return float4(finalCol, 1.0);
+               return float4(finalColWithHalo + haloColor, 1.0);
 
                //col  = col/8;
                 

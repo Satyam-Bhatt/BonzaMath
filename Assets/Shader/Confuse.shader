@@ -145,7 +145,7 @@ Shader "Unlit/Confuse"
                float col = RayMarch(rayOrigin, rayDirection, val);
 
 
-               float3 fogColor = float3(0.2, 0.1, 0.1);
+               float3 fogColor = float3(0.5, 0.6, 0.7);
 
                float fogDepth = saturate(float(val)/float(100) * _FogStr) ; //Gives Halo Ring but background is banded
                float fogstrength = saturate(col/float(MAXDIST));//Giver perfect mask for sphere
@@ -155,14 +155,13 @@ Shader "Unlit/Confuse"
                float needed =  inverseFogStr + other;
                float lerpp = InverseLerp(0.25, 1, needed);//Center gradient white and black rest
                float trueMask =  step(0.1, fogstrength) * lerpp;
-               //return lerpp;
                 
                float3 pointForLight = rayOrigin + col * rayDirection;
                float diffuseLight = GetLight(pointForLight);//Sphere with black background
 
                float3 finalCol = lerp( diffuseLight,fogColor, fogstrength);
 
-               float3 letsGo = lerp(finalCol, float3(1,1,1), trueMask);
+               float3 letsGo = lerp(finalCol + fogColor/15, float3(1,1,1) * 2, trueMask);
 
                return float4(letsGo, 1.0);
 
