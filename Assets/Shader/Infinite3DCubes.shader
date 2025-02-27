@@ -180,7 +180,7 @@ Shader "Unlit/Infinite3DCubes"
 
                //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
                float3 rayOrigin  = float3(0,0,-3); //Camera Movemenet
-               float3 rayDirection = normalize(float3(uv,1));
+               float3 rayDirection = normalize(float3(uv.x, uv.y,1));
 
                int val = 0;
                float col = RayMarch(rayOrigin, rayDirection, val);
