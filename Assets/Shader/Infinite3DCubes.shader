@@ -82,7 +82,7 @@ Shader "Unlit/Infinite3DCubes"
                 float originalZ = position.z + (_Time.y);
 
                 float testSphere = length(position - spherePosition) - radius;
-                return testSphere;
+                //return testSphere;
 
                 position.z += (_Time.y);//Movement but camera Movemenet is a bit better
 

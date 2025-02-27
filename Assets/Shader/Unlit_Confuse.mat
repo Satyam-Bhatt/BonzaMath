@@ -29,7 +29,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _FogStr: 0.99
+    - _FogStr: 1.86
     - _value1: 0
     - _value2: 0
     - _value3: 0

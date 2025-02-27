@@ -127,6 +127,11 @@ Shader "Unlit/Confuse"
                 return sin(_Time.y * 0.5 + Random(uv) * 10) * 0.5 + 0.5;
             }
 
+            float InverseLerp(float a, float b , float v)
+            {
+                return clamp((v - a) / (b - a), 0, 1);
+            }
+
             float4 frag (v2f i) : SV_Target
             {
                 float2 uv = i.uv * 2 - 1; //Center the scene
@@ -140,20 +145,26 @@ Shader "Unlit/Confuse"
                float col = RayMarch(rayOrigin, rayDirection, val);
 
 
-               float3 fogColor = float3(0.5, 0.6, 0.7);
+               float3 fogColor = float3(0.2, 0.1, 0.1);
 
-               float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //if we don't covert then the int division the result is truncated. This value also controls the strength of fog
-               float fogstrength = saturate(MAXDIST/STEPS) + 0.2;
-               float other = max(fogDepth, fogstrength);
-
-               //return other;
+               float fogDepth = saturate(float(val)/float(100) * _FogStr) ; //Gives Halo Ring but background is banded
+               float fogstrength = saturate(col/float(MAXDIST));//Giver perfect mask for sphere
+               float something = float3(0.2,0.2,0.2);
+               float other = max(fogDepth, something);
+               float inverseFogStr = 1 - fogstrength;
+               float needed =  inverseFogStr + other;
+               float lerpp = InverseLerp(0.25, 1, needed);//Center gradient white and black rest
+               float trueMask =  step(0.1, fogstrength) * lerpp;
+               //return lerpp;
                 
                float3 pointForLight = rayOrigin + col * rayDirection;
-               float diffuseLight = GetLight(pointForLight);
+               float diffuseLight = GetLight(pointForLight);//Sphere with black background
 
-               float3 finalCol = lerp( diffuseLight,fogColor, other);
+               float3 finalCol = lerp( diffuseLight,fogColor, fogstrength);
 
-               return float4(finalCol, 1.0);
+               float3 letsGo = lerp(finalCol, float3(1,1,1), trueMask);
+
+               return float4(letsGo, 1.0);
 
             }
             ENDCG
