@@ -33,7 +33,7 @@ Material:
     - _GridSize: 1.66
     - _SphereRadius: 0.4
     - _value: 1.54
-    - _value1: 2
+    - _value1: 1.96
     - _value2: 1.02
     - _value3: 2
     m_Colors:

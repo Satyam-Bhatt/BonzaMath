@@ -72,10 +72,13 @@ Shader "Unlit/Confuse"
                 float originalZ = position.z + (_Time.y);
 
                 float testSphere = length(position - spherePosition) - radius;
+                //return testSphere;
 
                 float3 repeat  = position;
 
-                position.xy = mul(position.xy, Rotation(_Time.y + position.z * 0.1));
+                //position.z = originalZ + _Time.y;
+
+                position.xy = mul(position.xy, Rotation(position.z * 0.1));
 
                 repeat = ModOperator(position, 2) - 1;//Repeats in all planes
 
@@ -119,7 +122,7 @@ Shader "Unlit/Confuse"
 
             float GetLight(float3 position)
             {
-                float3 lightPosition = float3(0,0,-5);
+                float3 lightPosition = float3(0,4,-5);
                 float3 lightVector = normalize(lightPosition - position);
                 float3 normal = GetNormal(position);
                 float diffuseLight = saturate(dot(lightVector, normal));
@@ -154,7 +157,7 @@ Shader "Unlit/Confuse"
                 uv.x = uv.x * 0.8/1;
 
                //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
-               float3 rayOrigin  = float3(0,0,-3); //Camera Movemenet
+               float3 rayOrigin  = float3(0,0,-3 + _Time.y); //Camera Movemenet
                float3 rayDirection = normalize(float3(uv,1));
 
                int val = 0;
@@ -162,6 +165,12 @@ Shader "Unlit/Confuse"
 
                float3 pointForLight = rayOrigin + col * rayDirection;
                float diffuseLight = GetLight(pointForLight);//Sphere with black background
+
+               float4 tex = tex2D(_MainTex, pointForLight.xy);
+               tex += tex2D(_MainTex, pointForLight.yz);
+               tex += tex2D(_MainTex, pointForLight.zx);
+
+               return (tex * 0.5) * diffuseLight;
 
                return diffuseLight;
 
