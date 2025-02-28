@@ -40,7 +40,7 @@ Shader "Unlit/Infinite3DCubes"
             };
 
             sampler2D _MainTex;
-            float4 _MainTex_ST, _FogColor;
+            float4 _MainTex_ST, _FogColor, tex;
             float _value1, _value2, _value3, _FogStr;
 
             v2f vert (appdata v)
@@ -88,7 +88,12 @@ Shader "Unlit/Infinite3DCubes"
                 position.z += (_Time.y);//Movement but camera Movemenet is a bit better
 
                 //Spiral Rotation
-                position.xy = mul(position.xy, Rotation(originalZ * 0.1));
+                position.xy = mul(position.xy, Rotation(_Time.y * 0.5 + originalZ * 0.1));
+                 
+                tex = tex2D(_MainTex, position.xy);
+                tex += tex2D(_MainTex, position.yz);
+				tex += tex2D(_MainTex, position.zx);
+				//tex /= 3;
 
                 //Apply sin wave to the y component
 				//position.y += 0.8 * sin(position.z * 0.5); // No Movemenet
@@ -182,7 +187,7 @@ Shader "Unlit/Infinite3DCubes"
                 uv.x = uv.x * 0.8/1;
 
                //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
-               float3 rayOrigin  = float3(0,2,-3); //Camera Movemenet
+               float3 rayOrigin  = float3(0,2,-3); //Camera
                float3 rayDirection = normalize(float3(uv.x, uv.y,1));
 
                int val = 0;
@@ -192,7 +197,7 @@ Shader "Unlit/Infinite3DCubes"
                float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //Creates Halo but the background is banded
                float greyCol = float3(0.2,0.2,0.2);
                float removeBanding = max(fogDepth, greyCol); //Removed circular bands in the background also maintins the Halo
-               float diffuseMask = saturate(col/float(MAXDIST/4)); //Giver perfect mask for sphere
+               float diffuseMask = saturate(col/float(MAXDIST/8)); //Giver perfect mask for sphere
                float inverseDiffuseMask = 1 - diffuseMask; //White sphere and rest is black
                float maskWithHalo = inverseDiffuseMask + removeBanding; //Center gradient white and grey rest
                float maskForDiffuseHalo = InverseLerp(0.2, 1, maskWithHalo); //Center gradient white and black rest
@@ -201,9 +206,13 @@ Shader "Unlit/Infinite3DCubes"
                float3 pointForLight = rayOrigin + col * rayDirection;
                float diffuseLight = GetLight(pointForLight);
 
+               //tex = tex2D(_MainTex, pointForLight.xy);
+			   //tex += tex2D(_MainTex, pointForLight.yz);
+			   //tex += tex2D(_MainTex, pointForLight.zx);
 
-               float3 finalCol = lerp( diffuseLight,_FogColor, diffuseMask);
+               float3 finalCol = lerp( diffuseLight * tex,_FogColor, diffuseMask);
                return float4 (finalCol, 1);
+               
                float3 finalColWithHalo = lerp( finalCol + _FogColor/5,1, maskForHalo);
 
                float3 haloColor = maskForHalo * _FogColor * 5;
