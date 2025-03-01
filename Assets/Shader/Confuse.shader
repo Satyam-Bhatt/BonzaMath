@@ -78,7 +78,8 @@ Shader "Unlit/Confuse"
 
                 //position.xy = mul(position.xy, Rotation(position.z * 0.1));
 
-                position.y += 0.5 * sin(originalZ * 0.5 + _Time.y * 5);
+                //position.y += 0.5 * sin(originalZ * 0.5 + _Time.y * 5);
+                position.y += 2+2*smoothstep(0,0.7,sin(originalZ * 0.5 + _Time.y * 1));
 
                 float3 repeat  = position;
 
