@@ -20,7 +20,7 @@ Shader "Unlit/Infinite3DCubes"
             #pragma vertex vert
             #pragma fragment frag
 
-            #define STEPS 200
+            #define STEPS 100
             #define MAXDIST 100
             #define MINDIST 0.001
             #define SURF_DIST 1

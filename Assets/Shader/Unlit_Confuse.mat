@@ -35,9 +35,9 @@ Material:
     - _RepeatSize: 1
     - _RotationSpeed: 0.5
     - _SphereSize: 0.2
-    - _value1: 0
-    - _value2: 0
-    - _value3: 0
+    - _value1: 2
+    - _value2: 2
+    - _value3: 2
     m_Colors:
     - _BaseColor: {r: 0.8, g: 0.29999998, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

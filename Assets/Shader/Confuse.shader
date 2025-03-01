@@ -19,7 +19,7 @@ Shader "Unlit/Confuse"
             #pragma vertex vert
             #pragma fragment frag
 
-            #define STEPS 200
+            #define STEPS 100
             #define MAXDIST 100
             #define MINDIST 0.001
             #define SURF_DIST 1
@@ -74,13 +74,18 @@ Shader "Unlit/Confuse"
                 float testSphere = length(position - spherePosition) - radius;
                 //return testSphere;
 
+                position.z = originalZ + _Time.y;
+
+                //position.xy = mul(position.xy, Rotation(position.z * 0.1));
+
+                position.y += 0.5 * sin(originalZ * 0.5 + _Time.y * 5);
+
                 float3 repeat  = position;
 
-                //position.z = originalZ + _Time.y;
 
-                position.xy = mul(position.xy, Rotation(position.z * 0.1));
-
-                repeat = ModOperator(position, 2) - 1;//Repeats in all planes
+                //repeat = ModOperator(position, 2) - 1;//Repeats in all planes
+                repeat.x = ModOperator(position.x, _value1) - 1;
+                repeat.z = ModOperator(position.z, _value2) - 1;
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
 
@@ -157,7 +162,7 @@ Shader "Unlit/Confuse"
                 uv.x = uv.x * 0.8/1;
 
                //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
-               float3 rayOrigin  = float3(0,0,-3 + _Time.y); //Camera Movemenet
+               float3 rayOrigin  = float3(0,2,-3); //Camera Movemenet
                float3 rayDirection = normalize(float3(uv,1));
 
                int val = 0;
@@ -166,11 +171,9 @@ Shader "Unlit/Confuse"
                float3 pointForLight = rayOrigin + col * rayDirection;
                float diffuseLight = GetLight(pointForLight);//Sphere with black background
 
-               float4 tex = tex2D(_MainTex, pointForLight.xy);
-               tex += tex2D(_MainTex, pointForLight.yz);
-               tex += tex2D(_MainTex, pointForLight.zx);
-
-               return (tex * 0.5) * diffuseLight;
+               //float4 tex = tex2D(_MainTex, pointForLight.xy);
+               //tex += tex2D(_MainTex, pointForLight.yz);
+               //tex += tex2D(_MainTex, pointForLight.zx);
 
                return diffuseLight;
 
