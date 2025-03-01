@@ -79,7 +79,7 @@ Shader "Unlit/Confuse"
                 //position.xy = mul(position.xy, Rotation(position.z * 0.1));
 
                 //position.y += 0.5 * sin(originalZ * 0.5 + _Time.y * 5);
-                position.y += 2+2*smoothstep(0,0.7,sin(originalZ * 0.5 + _Time.y * 1));
+                position.y += (smoothstep(0,0.9,sin(originalZ * 0.1 + _Time.y * 2)) * 1); // Change values to make them look bouncy. Use Graphtoy
 
                 float3 repeat  = position;
 
@@ -163,7 +163,7 @@ Shader "Unlit/Confuse"
                 uv.x = uv.x * 0.8/1;
 
                //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
-               float3 rayOrigin  = float3(0,2,-3); //Camera Movemenet
+               float3 rayOrigin  = float3(0,3,-3); //Camera Movemenet
                float3 rayDirection = normalize(float3(uv,1));
 
                int val = 0;
