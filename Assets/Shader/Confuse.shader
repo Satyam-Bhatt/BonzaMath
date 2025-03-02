@@ -19,9 +19,9 @@ Shader "Unlit/Confuse"
             #pragma vertex vert
             #pragma fragment frag
 
-            #define STEPS 100
+            #define STEPS 200
             #define MAXDIST 100
-            #define MINDIST 0.001
+            #define MINDIST 0.0001
             #define SURF_DIST 1
 
             #include "UnityCG.cginc"
@@ -62,6 +62,11 @@ Shader "Unlit/Confuse"
                 return x - y * floor(x/y);
             }
 
+            float hash(float n) 
+{
+    return frac(sin(n) * 43758.5453);
+}
+
             float GetDist(float3 position)
             {
                 float distanceToPlane = position.y;
@@ -69,17 +74,30 @@ Shader "Unlit/Confuse"
                 float3 spherePosition = float3(0,0,1);
                 float radius = 0.4;
 
-                float originalZ = position.z + (_Time.y);
+                float originalZ = position.z;// + (_Time.y);
+                float originalX = position.x;// + (_Time.y);
 
                 float testSphere = length(position - spherePosition) - radius;
                 //return testSphere;
 
-                position.z = originalZ + _Time.y;
+                //position.z = originalZ + _Time.y;
 
                 //position.xy = mul(position.xy, Rotation(position.z * 0.1));
 
                 //position.y += 0.5 * sin(originalZ * 0.5 + _Time.y * 5);
-                position.y += (smoothstep(0,0.9,sin(originalZ * 0.1 + _Time.y * 2)) * 1); // Change values to make them look bouncy. Use Graphtoy
+                //position.y -= 0.5 * sin(originalX * 0.5 + _Time.y * 5);
+                //position.y += (smoothstep(0,0.9,sin(originalZ * 0.1 + _Time.y * 2)) * 1); // Change values to make them look bouncy. Use Graphtoy
+
+                spherePosition.y += (smoothstep(0,2,sin(originalZ * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,2));
+                spherePosition.y += (smoothstep(0,2,sin(originalX * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,2));
+
+                //position.y += (smoothstep(0,0.9,sin(originalX * 0.5 + _Time.y * 2)) * 1);
+
+                //position.y += fmod(originalZ * 0.05 + _Time.y * 1, 1);
+
+                //float uniqueTime = _Time.y + position.x * 0.2 + position.z * 0.3;
+                //position.y += 0.5 * sin(uniqueTime * 2.0);
+
 
                 float3 repeat  = position;
 
@@ -163,7 +181,7 @@ Shader "Unlit/Confuse"
                 uv.x = uv.x * 0.8/1;
 
                //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
-               float3 rayOrigin  = float3(0,3,-3); //Camera Movemenet
+               float3 rayOrigin  = float3(0,2,-3); //Camera Movemenet
                float3 rayDirection = normalize(float3(uv,1));
 
                int val = 0;

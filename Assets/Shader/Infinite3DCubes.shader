@@ -100,6 +100,11 @@ Shader "Unlit/Infinite3DCubes"
                 //position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
                 //position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
 
+                //-> Spiral and Zoom
+                //-> Sin Wave + Zoom + Camera Offset from ShaderToy
+                //-> Bouncing Spheres
+                //-> Smoothstep Wave
+
                 position  = position * float3(1,1,0.8);//Scaling
 
                 float3 repeat  = position;
