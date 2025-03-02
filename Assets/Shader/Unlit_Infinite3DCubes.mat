@@ -33,8 +33,8 @@ Material:
     - _GridSize: 1.66
     - _SphereRadius: 0.4
     - _value: 1.54
-    - _value1: 1.96
-    - _value2: 1.02
+    - _value1: 1.7
+    - _value2: 2
     - _value3: 2
     m_Colors:
     - _FogColor: {r: 0.3794055, g: 0.46328765, b: 0.5471698, a: 1}

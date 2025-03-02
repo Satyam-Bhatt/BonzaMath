@@ -1,11 +1,8 @@
-Shader "Unlit/Confuse"
+Shader "Unlit/InfiniteBoxFrame"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _value1("Value1" , Float) = 0
-        _value2("Value2" , Float) = 0
-        _value3("Value3" , Float) = 0
         _FogStr("Fog Strength" , Range(0.01, 0.1)) = 0.03
         _FogColor("Fog Color", Color) = (0.5, 0.6, 0.7, 1.0)
         _LightColor("Light Color", Color) = (1.0, 0.9, 0.8, 1.0)
@@ -44,8 +41,8 @@ Shader "Unlit/Confuse"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            float _value1, _value2, _value3, _FogStr;
-            float4 _FogColor, _LightColor, tex;
+            float _FogStr;
+            float4 _FogColor, _LightColor;
             float _CellSize;
 
             v2f vert (appdata v)
@@ -71,10 +68,6 @@ Shader "Unlit/Confuse"
             float hash(float n) 
             {
                 return frac(sin(n) * 43758.5453);
-            }
-
-            float ease(float x) {
-                return smoothstep(0.0, 1.0, x);
             }
 
             float ease_step(float x, float k) {
@@ -117,30 +110,39 @@ Shader "Unlit/Confuse"
 
             float GetDist(float3 position)
             {
-                position.z = position.z + _Time.y;
+                float3 originalPos = position;
+                
+                float3 repeatPos = position;
+                float cellSize = _CellSize; 
 
-                float distanceToPlane = position.y + 0.5;
-
-                float3 spherePosition = float3(0,0,1);
-                float radius = 0.4;
-
-                float originalZ = position.z;
-                float originalX = position.x;
-
-                position.y += (smoothstep(0,2,sin(originalZ * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1));
-                position.y += (smoothstep(0,2,sin(originalX * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1));
-
-                float3 repeat  = position;
-                //Comment one out to repeat in specific plane
-                repeat.x = ModOperator(position.x, _value1) - 1;
-                repeat.z = ModOperator(position.z, _value2) - 1;
-                //repeat.y = ModOperator(position.y, _value3) - 1;
-
-                float sphereDistance = length(repeat - spherePosition) - radius;
-
-                float output = min(distanceToPlane, sphereDistance);
-
-                return output;
+                // Modulo operation for repetition
+                repeatPos.x = ModOperator(position.x, cellSize) - cellSize * 0.5;
+                repeatPos.z = ModOperator(position.z, cellSize) - cellSize * 0.5;
+                repeatPos.y = ModOperator(position.y, cellSize) - cellSize * 0.5;
+                
+                // Add subtle variation based on cell position
+                float cellVariation = sin(floor(position.x/cellSize) * 0.3 + 
+                                       floor(position.z/cellSize) * 0.5 +
+                                       floor(position.y/cellSize) * 0.7);
+                float timeOffset = cellVariation * 0.2;
+                
+                // First rotation for box frame
+                float3 boxPos = repeatPos;
+                boxPos.xz = mul(boxPos.xz, Rotation(-_Time.y * 0.5 + timeOffset));
+                float boxFrame = sdBoxFrame(boxPos, float3(0.85, 0.85, 0.85), 0.06);
+                
+                // Second rotation for torus shapes
+                float3 torusPos = repeatPos;
+                torusPos.xz = mul(torusPos.xz, Rotation(_Time.y * 0.5 + timeOffset));
+                float roundTor = sdTorus82(torusPos.xzy, float2(0.5, 0.2));
+                float torus = sdTorus(torusPos.xzy, float2(0.5, 0.1));
+                
+                // Blend between the two torus types
+                float blendFactor = sin(_Time.y + cellVariation) * 0.5 + 0.5;
+                float torusShape = lerp(roundTor, torus, blendFactor);
+                
+                // Combine shapes
+                return min(boxFrame, torusShape);
             }
 
             float RayMarch(float3 rayOrigin, float3 rayDirection, out int val)
@@ -215,21 +217,21 @@ Shader "Unlit/Confuse"
                 float2 uv = i.uv * 2 - 1; // Center the scene
                 uv.x *= 0.8; // Adjust aspect ratio
                 
-                float3 rayOrigin = float3(0,2,0);
+                float3 rayOrigin = float3(0,0,_Time.y * 2);
                 
                 // Ray direction with proper camera orientation
                 float3 rayDirection = normalize(float3(uv.x, uv.y,1));
 
-                //rayDirection.xz = mul(rayDirection.xz, Rotation(ease_step(_Time.y * 0.25, 0.25) * (PI/2)));
-                //rayDirection.xy = mul(rayDirection.xy, Rotation(ease_step(_Time.y * 0.25 + 0.5, 0.25) * (PI/2)));
+                rayDirection.xz = mul(rayDirection.xz, Rotation(ease_step(_Time.y * 0.25, 0.25) * (PI/2)));
+                rayDirection.xy = mul(rayDirection.xy, Rotation(ease_step(_Time.y * 0.25 + 0.5, 0.25) * (PI/2)));
                 
                 // Ray march
                 int steps = 0;
                 float dist = RayMarch(rayOrigin, rayDirection, steps);
                 
                 // Calculate fog based on distance and steps
-                float fogAmount = 1 - exp2(-dist * _FogStr);
-
+                float fogAmount = 1.0 - exp2(-dist * _FogStr);
+                
                 // Initial color (black)
                 float3 color = float3(0, 0, 0);
                 
