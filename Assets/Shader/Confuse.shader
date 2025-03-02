@@ -115,17 +115,51 @@ Shader "Unlit/Confuse"
                     length(max(float3(q.x,q.y,p.z),0.0))+min(max(q.x,max(q.y,p.z)),0.0));
             }
 
+            
+            float opSmoothUnion( float d1, float d2, float k )
+            {
+                float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );
+                return lerp( d2, d1, h ) - k*h*(1.0-h);
+            }
+
+            float opSmoothSubtraction( float d1, float d2, float k )
+            {
+                float h = clamp( 0.5 - 0.5*(d2+d1)/k, 0.0, 1.0 );
+                return lerp( d2, -d1, h ) + k*h*(1.0-h);
+            }
+
+            float opSmoothIntersection( float d1, float d2, float k )
+            {
+                float h = clamp( 0.5 - 0.5*(d2-d1)/k, 0.0, 1.0 );
+                return lerp( d2, d1, h ) + k*h*(1.0-h);
+            }
+
             float GetDist(float3 position)
             {
                 position.z = position.z + _Time.y;
+                float originalZ = position.z;
+				float originalX = position.x;
 
-                float distanceToPlane = position.y + 0.5;
+                float distanceToPlane = position.y + sin(originalZ * 1 + _Time.y * 4) * 0.1 + sin(originalX * 1 + _Time.y * 4) * 0.1;
+
+                // Define orbit center and radius
+                float3 orbitCenter = float3(0, 0, 0); // Change this to your desired center point
+                float orbitRadius = 4.0; // Change this to control how far it orbits
+                float orbitSpeed = 1; // Controls orbit speed
+
+                // Calculate orbit position
+                float orbitAngle = _Time.y * orbitSpeed;
+                float orbitX = orbitCenter.x + orbitRadius * sin(orbitAngle);
+                float orbitZ = orbitCenter.z + orbitRadius * cos(orbitAngle);
+
+                float v = 6;
+                v += _Time.y;
+                float3 positionForTorus = position.xzy - float3(orbitX,v,orbitZ);
+                positionForTorus.xy = mul(positionForTorus.xy, Rotation(_Time.y));
+                float torus = sdTorus(positionForTorus, float2(0.8, 0.2));
 
                 float3 spherePosition = float3(0,0,1);
                 float radius = 0.4;
-
-                float originalZ = position.z;
-                float originalX = position.x;
 
                 position.y += (smoothstep(0,2,sin(originalZ * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1));
                 position.y += (smoothstep(0,2,sin(originalX * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1));
@@ -138,7 +172,8 @@ Shader "Unlit/Confuse"
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
 
-                float output = min(distanceToPlane, sphereDistance);
+                float output = opSmoothUnion(distanceToPlane, sphereDistance, 0.6);
+                output = opSmoothUnion(output, torus, 0.5);
 
                 return output;
             }
@@ -215,7 +250,7 @@ Shader "Unlit/Confuse"
                 float2 uv = i.uv * 2 - 1; // Center the scene
                 uv.x *= 0.8; // Adjust aspect ratio
                 
-                float3 rayOrigin = float3(0,2,0);
+                float3 rayOrigin = float3(0,1,0);
                 
                 // Ray direction with proper camera orientation
                 float3 rayDirection = normalize(float3(uv.x, uv.y,1));
@@ -257,7 +292,7 @@ Shader "Unlit/Confuse"
                 color = lerp(color, _FogColor.rgb, fogAmount);
                 
                 // Add dithering to reduce banding
-                color += Dither(i.uv);
+                //color += Dither(i.uv);
                 
                 // Add some subtle vignette
                 float vignette = length(i.uv - 0.5) * 0.5;
