@@ -27,6 +27,10 @@ Shader "Unlit/Confuse"
             #define MINDIST 0.0001
             #define SURF_DIST 1
             #define PI 3.141592653589793
+            #define OBJ_NONE 0
+            #define OBJ_SPHERE 1
+			#define OBJ_TORUS 2
+			#define OBJ_PLANE 3
 
             #include "UnityCG.cginc"
 
@@ -134,28 +138,29 @@ Shader "Unlit/Confuse"
                 return lerp( d2, d1, h ) + k*h*(1.0-h);
             }
 
-            float GetDist(float3 position)
+            float GetDist(float3 position , out int objectID)
             {
+                objectID = OBJ_NONE;
+
                 position.z = position.z + _Time.y;
                 float originalZ = position.z;
 				float originalX = position.x;
 
                 float distanceToPlane = position.y + sin(originalZ * 1 + _Time.y * 4) * 0.1 + sin(originalX * 1 + _Time.y * 4) * 0.1;
+                float minDist = distanceToPlane;
+				objectID = OBJ_PLANE;
 
                 // Define orbit center and radius
                 float3 orbitCenter = float3(0, 0, 0); // Change this to your desired center point
-                float orbitRadius = 4.0; // Change this to control how far it orbits
-                float orbitSpeed = 1; // Controls orbit speed
 
                 // Calculate orbit position
-                float orbitAngle = _Time.y * orbitSpeed;
-                float orbitX = orbitCenter.x + orbitRadius * sin(orbitAngle);
-                float orbitZ = orbitCenter.z + orbitRadius * cos(orbitAngle);
+                float orbitX = orbitCenter.x + 4 * sin(_Time.y * 1);
+                float orbitZ = orbitCenter.z + 4 * cos(_Time.y * 2);
 
                 float v = 6;
                 v += _Time.y;
                 float3 positionForTorus = position.xzy - float3(orbitX,v,orbitZ);
-                positionForTorus.xy = mul(positionForTorus.xy, Rotation(_Time.y));
+                positionForTorus.xy = mul(positionForTorus.xy, Rotation(_Time.y * 2));
                 float torus = sdTorus(positionForTorus, float2(0.8, 0.2));
 
                 float3 spherePosition = float3(0,0,1);
@@ -172,37 +177,53 @@ Shader "Unlit/Confuse"
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
 
-                float output = opSmoothUnion(distanceToPlane, sphereDistance, 0.6);
-                output = opSmoothUnion(output, torus, 0.5);
+                if(sphereDistance < minDist)
+                {
+                    objectID = OBJ_SPHERE;
+                }
 
-                return output;
+                if(torus < minDist)
+                {
+					objectID = OBJ_TORUS;
+                }
+
+                float finalDist = opSmoothUnion(distanceToPlane, sphereDistance, 0.6);
+                finalDist = opSmoothUnion(finalDist, torus, 0.8);
+
+                return finalDist;
             }
 
-            float RayMarch(float3 rayOrigin, float3 rayDirection, out int val)
+            float RayMarch(float3 rayOrigin, float3 rayDirection, out int hitObjectID)
             {
                 float distanceOrigin = 0;
-                int i;
-                for(i = 0; i < STEPS; i++)
+                hitObjectID = OBJ_NONE;
+                int objectID = OBJ_NONE;
+
+                for(int i = 0; i < STEPS; i++)
                 {
                     float3 firstPointOfContact = rayOrigin + distanceOrigin * rayDirection;
-                    float distanceToTheObject = GetDist(firstPointOfContact);
-                    distanceOrigin += distanceToTheObject * 0.95; // Slightly reduce step size for better accuracy
+                    float distanceToTheObject = GetDist(firstPointOfContact, objectID);
+                    distanceOrigin += distanceToTheObject * 0.95;
                     
-                    if(distanceOrigin > MAXDIST || distanceToTheObject < MINDIST) break;
+                    if(distanceOrigin > MAXDIST || distanceToTheObject < MINDIST)
+                    {
+                        hitObjectID = objectID;
+                        break;
+                    }
                 }
-                val = i;
                 return distanceOrigin;
             }
 
             float3 GetNormal(float3 position)
             {
                 float2 smallMarginShift = float2(0.0001, 0);
-                float distanceToPoint = GetDist(position);
+                int objectID = OBJ_NONE;
+                float distanceToPoint = GetDist(position, objectID);
 
                 float3 normal = float3(
-                    distanceToPoint - GetDist(position - smallMarginShift.xyy),
-                    distanceToPoint - GetDist(position - smallMarginShift.yxy),
-                    distanceToPoint - GetDist(position - smallMarginShift.yyx)
+                    distanceToPoint - GetDist(position - smallMarginShift.xyy, objectID),
+                    distanceToPoint - GetDist(position - smallMarginShift.yxy, objectID),
+                    distanceToPoint - GetDist(position - smallMarginShift.yyx, objectID)
                 );
 
                 return normalize(normal);
@@ -255,12 +276,9 @@ Shader "Unlit/Confuse"
                 // Ray direction with proper camera orientation
                 float3 rayDirection = normalize(float3(uv.x, uv.y,1));
 
-                //rayDirection.xz = mul(rayDirection.xz, Rotation(ease_step(_Time.y * 0.25, 0.25) * (PI/2)));
-                //rayDirection.xy = mul(rayDirection.xy, Rotation(ease_step(_Time.y * 0.25 + 0.5, 0.25) * (PI/2)));
-                
                 // Ray march
-                int steps = 0;
-                float dist = RayMarch(rayOrigin, rayDirection, steps);
+                int objectID = OBJ_NONE;
+                float dist = RayMarch(rayOrigin, rayDirection, objectID);
                 
                 // Calculate fog based on distance and steps
                 float fogAmount = 1 - exp2(-dist * _FogStr);
@@ -275,9 +293,25 @@ Shader "Unlit/Confuse"
                     
                     // Add some color variation based on position and normal
                     float3 normal = GetNormal(hitPos);
-                    float3 objectColor = float3(0.8, 0.3, 0.2) * (normal.y * 0.5 + 0.5) +
-                                         float3(0.2, 0.5, 0.8) * (normal.x * 0.5 + 0.5) +
-                                         float3(0.3, 0.6, 0.3) * (normal.z * 0.5 + 0.5);
+                    float3 objectColor = float3(0,0,0);
+
+                    if(objectID == OBJ_TORUS)
+                    {
+                        objectColor = float3(0, 1, 0);
+                    }
+                    else if(objectID == OBJ_SPHERE)
+                    {
+                        objectColor = float3(0.8, 0.3, 0.2) * (normal.y * 0.5 + 0.5) +
+                                      float3(0.2, 0.5, 0.8) * (normal.x * 0.5 + 0.5) +
+                                      float3(0.3, 0.6, 0.3) * (normal.z * 0.5 + 0.5);
+                        objectColor *= float3(1,0,1);
+                    }
+                    else
+                    {
+                        objectColor = float3(0.8, 0.3, 0.2) * (normal.y * 0.5 + 0.5) +
+                                      float3(0.2, 0.5, 0.8) * (normal.x * 0.5 + 0.5) +
+                                      float3(0.3, 0.6, 0.3) * (normal.z * 0.5 + 0.5);
+                    }
                     
                     // Apply lighting to object color
                     color = objectColor * lighting;
