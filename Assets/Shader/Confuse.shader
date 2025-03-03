@@ -143,6 +143,7 @@ Shader "Unlit/Confuse"
                 objectID = OBJ_NONE;
 
                 position.z = position.z + _Time.y;
+                position.x = position.x + _Time.y * 0.5;
                 float originalZ = position.z;
 				float originalX = position.x;
 
@@ -154,8 +155,8 @@ Shader "Unlit/Confuse"
                 float3 orbitCenter = float3(0, 0, 0); // Change this to your desired center point
 
                 // Calculate orbit position
-                float orbitX = orbitCenter.x + 4 * sin(_Time.y * 1);
-                float orbitZ = orbitCenter.z + 4 * cos(_Time.y * 2);
+                float orbitX = orbitCenter.x + 4 * sin(_Time.y * 1) + _Time.y * 0.5;
+                float orbitZ = orbitCenter.z + 5 * cos(_Time.y * 2);
 
                 float v = 6;
                 v += _Time.y;
@@ -166,8 +167,8 @@ Shader "Unlit/Confuse"
                 float3 spherePosition = float3(0,0,1);
                 float radius = 0.4;
 
-                position.y += (smoothstep(0,2,sin(originalZ * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1));
-                position.y += (smoothstep(0,2,sin(originalX * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1));
+                position.y += (smoothstep(0,2,sin(originalZ * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1) * 1.5);
+                position.y += (smoothstep(0,2,sin(originalX * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1) * 1.5);
 
                 float3 repeat  = position;
                 //Comment one out to repeat in specific plane
@@ -266,6 +267,16 @@ Shader "Unlit/Confuse"
                 return Random(uv) * 0.03 - 0.015; // Small random offset for dithering
             }
 
+            float3 palette( in float t)
+            {
+                float3 a = float3(0.6, 0.5, 0.6);
+                float3 b = float3(0.2, 0.2, 0.3);
+                float3 c = float3(0.8, 0.8, 0.8);
+                float3 d = float3(0.0, 0.1, 0.2);
+
+                return a + b*cos( 6.28318*(c*t+d) );
+            }
+
             float4 frag(v2f i) : SV_Target
             {
                 float2 uv = i.uv * 2 - 1; // Center the scene
@@ -295,22 +306,40 @@ Shader "Unlit/Confuse"
                     float3 normal = GetNormal(hitPos);
                     float3 objectColor = float3(0,0,0);
 
-                    if(objectID == OBJ_TORUS)
-                    {
-                        objectColor = float3(0, 1, 0);
-                    }
-                    else if(objectID == OBJ_SPHERE)
-                    {
-                        objectColor = float3(0.8, 0.3, 0.2) * (normal.y * 0.5 + 0.5) +
-                                      float3(0.2, 0.5, 0.8) * (normal.x * 0.5 + 0.5) +
-                                      float3(0.3, 0.6, 0.3) * (normal.z * 0.5 + 0.5);
-                        objectColor *= float3(1,0,1);
-                    }
+if(objectID == OBJ_TORUS)
+{
+    // Create a bright cyan/blue color for when the torus is up
+    float3 upColor = float3(0.2, 0.8, 1.0);
+    
+    // Warmer color for when torus is down (blending with the ground)
+    float3 downColor = float3(0.9, 0.4, 0.6);
+    
+    // Get base color influenced by normals
+    float3 normalColor = float3(0.7, 0.2, 0.4) * (normal.y * 0.5 + 0.5) +
+                        float3(0.1, 0.6, 0.9) * (normal.x * 0.5 + 0.5) +
+                        float3(0.5, 0.7, 0.2) * (normal.z * 0.5 + 0.5);
+    
+    // Add palette variation with time
+    float3 paletteColor = normalColor + palette(dist * 0.3 + _Time.y * 0.7);
+    
+    // Calculate blend factor based on position in animation cycle
+    // This makes the transition sharper between up and down states
+    float blendFactor = pow(cos(_Time.y * 2) * 0.5 + 0.5, 2.0);
+    
+    // Add glow effect when the torus is at its highest point
+    float glowIntensity = pow(1.0 - blendFactor, 3.0) * 1.5;
+    float3 glowColor = float3(0.1, 0.9, 1.0) * glowIntensity;
+    
+    // Linear interpolation between colors based on animation position
+    objectColor = lerp(paletteColor, downColor, blendFactor) + glowColor;
+}
                     else
                     {
                         objectColor = float3(0.8, 0.3, 0.2) * (normal.y * 0.5 + 0.5) +
                                       float3(0.2, 0.5, 0.8) * (normal.x * 0.5 + 0.5) +
                                       float3(0.3, 0.6, 0.3) * (normal.z * 0.5 + 0.5);
+
+                        objectColor += palette(dist * 0.5 + _Time.y * 1);
                     }
                     
                     // Apply lighting to object color
