@@ -31,6 +31,7 @@ Shader "Unlit/Confuse"
             #define OBJ_SPHERE 1
 			#define OBJ_TORUS 2
 			#define OBJ_PLANE 3
+            #define OBJ_SPHERE_SINGLE 4
 
             #include "UnityCG.cginc"
 
@@ -109,6 +110,11 @@ Shader "Unlit/Confuse"
                 return length(q)-t.y;
             }
 
+            float sdSphere( float3 p, float s )
+            {
+              return length(p)-s;
+            }
+
             float sdBoxFrame(float3 p, float3 b, float e)
             {
                 p = abs(p)-b;
@@ -166,7 +172,14 @@ Shader "Unlit/Confuse"
 
                 float3 positionForTorus2 = position.xzy - float3(orbitX,v,orbitZ);
                 positionForTorus2.yz = mul(positionForTorus2.yz, Rotation(-_Time.y * 3));
-				float torus2 = sdTorus(positionForTorus2, float2(0.6, 0.05));
+				float torus2 = sdTorus(positionForTorus2, float2(0.569, 0.05));
+
+                float3 positionForTorus3 = position.xzy - float3(orbitX,v,orbitZ);
+                positionForTorus3.xy = mul(positionForTorus3.xy, Rotation(-_Time.y * 4));
+				float torus3 = sdTorus(positionForTorus3, float2(0.36, 0.06));
+
+                float3 positionForSphere = position.xyz - float3(orbitX,orbitZ,v);
+				float sphere_Center = sdSphere(positionForSphere, 0.2);
 
                 float3 spherePosition = float3(0,0,1);
                 float radius = 0.4;
@@ -182,24 +195,33 @@ Shader "Unlit/Confuse"
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
 
+                if(sphere_Center < minDist)
+                {
+					objectID = OBJ_SPHERE_SINGLE;
+					minDist = sphere_Center;
+				}
+
+                if(torus < minDist || torus2 < minDist || torus3 < minDist)
+                {
+					objectID = OBJ_TORUS;
+					minDist = torus3;
+                }
+
                 if(sphereDistance < minDist)
                 {
                     objectID = OBJ_SPHERE;
+                    minDist = sphereDistance;
                 }
 
-                if(torus < minDist)
-                {
-					objectID = OBJ_TORUS;
-                }
+                float ground = opSmoothUnion(distanceToPlane, sphereDistance, 0.6);
+                float rotatingSpheres = opSmoothUnion(torus2, torus, 0.2);
+				rotatingSpheres = opSmoothUnion(rotatingSpheres, torus3, 0.2);
+                rotatingSpheres = opSmoothUnion(rotatingSpheres, sphere_Center, 0.2);
 
-                float finalDist = opSmoothUnion(distanceToPlane, sphereDistance, 0.6);
-                finalDist = opSmoothUnion(finalDist, torus, 0.8);
-				finalDist = opSmoothUnion(finalDist, torus2, 0.2);
+                float finalDist = opSmoothUnion(ground, rotatingSpheres, 0.8);
 
                 return finalDist;
             }
-
-
 
             float RayMarch(float3 rayOrigin, float3 rayDirection, out int hitObjectID)
             {
@@ -326,6 +348,22 @@ Shader "Unlit/Confuse"
                         float3 paletteColor = normalColor + palette(dist * 0.5 + _Time.y * 1);
 
                         float blendFactor = 1 * cos(_Time.y * 2);
+    
+                        objectColor = lerp(paletteColor, upColor , blendFactor);
+                    }
+                    else if(objectID == OBJ_SPHERE_SINGLE)
+                    {
+                        float3 upColor = float3(4, 4, 0.2);
+    
+                        float3 downColor = float3(0.9, 0.4, 0.6);
+    
+                        float3 normalColor = float3(0.8, 0.3, 0.2) * (normal.y * 0.5 + 0.5) +
+                                             float3(0.2, 0.5, 0.8) * (normal.x * 0.5 + 0.5) +
+                                             float3(0.3, 0.6, 0.3) * (normal.z * 0.5 + 0.5);
+    
+                        float3 paletteColor = normalColor + palette(dist * 0.5 + _Time.y * 1);
+
+                        float blendFactor = 0.4 * cos(_Time.y * 2);
     
                         objectColor = lerp(paletteColor, upColor , blendFactor);
                     }
