@@ -162,13 +162,17 @@ Shader "Unlit/Confuse"
                 v += _Time.y;
                 float3 positionForTorus = position.xzy - float3(orbitX,v,orbitZ);
                 positionForTorus.xy = mul(positionForTorus.xy, Rotation(_Time.y * 2));
-                float torus = sdTorus(positionForTorus, float2(0.8, 0.2));
+                float torus = sdTorus(positionForTorus, float2(0.8, 0.08));
+
+                float3 positionForTorus2 = position.xzy - float3(orbitX,v,orbitZ);
+                positionForTorus2.yz = mul(positionForTorus2.yz, Rotation(-_Time.y * 3));
+				float torus2 = sdTorus(positionForTorus2, float2(0.6, 0.05));
 
                 float3 spherePosition = float3(0,0,1);
                 float radius = 0.4;
 
-                position.y += (smoothstep(0,2,sin(originalZ * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1) * 1.5);
-                position.y += (smoothstep(0,2,sin(originalX * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1) * 1.5);
+                position.y += (smoothstep(0,2,sin(originalZ * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1) * 2);
+                position.y += (smoothstep(0,2,sin(originalX * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1) * 2);
 
                 float3 repeat  = position;
                 //Comment one out to repeat in specific plane
@@ -190,9 +194,12 @@ Shader "Unlit/Confuse"
 
                 float finalDist = opSmoothUnion(distanceToPlane, sphereDistance, 0.6);
                 finalDist = opSmoothUnion(finalDist, torus, 0.8);
+				finalDist = opSmoothUnion(finalDist, torus2, 0.2);
 
                 return finalDist;
             }
+
+
 
             float RayMarch(float3 rayOrigin, float3 rayDirection, out int hitObjectID)
             {
@@ -306,33 +313,22 @@ Shader "Unlit/Confuse"
                     float3 normal = GetNormal(hitPos);
                     float3 objectColor = float3(0,0,0);
 
-if(objectID == OBJ_TORUS)
-{
-    // Create a bright cyan/blue color for when the torus is up
-    float3 upColor = float3(0.2, 0.8, 1.0);
+                    if(objectID == OBJ_TORUS)
+                    {
+                        float3 upColor = float3(3, 1, 0.2);
     
-    // Warmer color for when torus is down (blending with the ground)
-    float3 downColor = float3(0.9, 0.4, 0.6);
+                        float3 downColor = float3(0.9, 0.4, 0.6);
     
-    // Get base color influenced by normals
-    float3 normalColor = float3(0.7, 0.2, 0.4) * (normal.y * 0.5 + 0.5) +
-                        float3(0.1, 0.6, 0.9) * (normal.x * 0.5 + 0.5) +
-                        float3(0.5, 0.7, 0.2) * (normal.z * 0.5 + 0.5);
+                        float3 normalColor = float3(0.8, 0.3, 0.2) * (normal.y * 0.5 + 0.5) +
+                                             float3(0.2, 0.5, 0.8) * (normal.x * 0.5 + 0.5) +
+                                             float3(0.3, 0.6, 0.3) * (normal.z * 0.5 + 0.5);
     
-    // Add palette variation with time
-    float3 paletteColor = normalColor + palette(dist * 0.3 + _Time.y * 0.7);
+                        float3 paletteColor = normalColor + palette(dist * 0.5 + _Time.y * 1);
+
+                        float blendFactor = 1 * cos(_Time.y * 2);
     
-    // Calculate blend factor based on position in animation cycle
-    // This makes the transition sharper between up and down states
-    float blendFactor = pow(cos(_Time.y * 2) * 0.5 + 0.5, 2.0);
-    
-    // Add glow effect when the torus is at its highest point
-    float glowIntensity = pow(1.0 - blendFactor, 3.0) * 1.5;
-    float3 glowColor = float3(0.1, 0.9, 1.0) * glowIntensity;
-    
-    // Linear interpolation between colors based on animation position
-    objectColor = lerp(paletteColor, downColor, blendFactor) + glowColor;
-}
+                        objectColor = lerp(paletteColor, upColor , blendFactor);
+                    }
                     else
                     {
                         objectColor = float3(0.8, 0.3, 0.2) * (normal.y * 0.5 + 0.5) +
