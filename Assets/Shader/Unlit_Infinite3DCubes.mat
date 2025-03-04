@@ -29,11 +29,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _FogStr: 0.87
+    - _FogStr: 1.17
     - _GridSize: 1.66
     - _SphereRadius: 0.4
     - _value: 1.54
-    - _value1: 1.7
+    - _value1: 2
     - _value2: 2
     - _value3: 2
     m_Colors:

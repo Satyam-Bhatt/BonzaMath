@@ -78,84 +78,54 @@ Shader "Unlit/Infinite3DCubes"
                 return frac(sin(n) * 43758.5453);
             }
 
-            //==================== Bouncing Spheres =================
+            //==================== Spiral Spheres =================
             float GetDist(float3 position)
             {
                 float distanceToPlane = position.y;
 
-                float3 spherePosition = float3(0,0,1);
+                float3 spherePosition = float3(0,0,0);
                 float radius = 0.4;
 
-                float originalZ = position.z;
-                float originalX = position.x;
+                float originalZ = position.z + (_Time.y);
 
-                position.y += (smoothstep(0,2,sin(originalZ * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,2));
-                position.y += (smoothstep(0,2,sin(originalX * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,2));
+                float testSphere = length(position - spherePosition) - radius;
+                //return testSphere;
+
+                position.z += (_Time.y);//Movement but camera Movemenet is a bit better
+
+                //Spiral Rotation
+                position.xy = mul(position.xy, Rotation(_Time.y * 0.5 + originalZ * 0.1));
                  
                 tex = tex2D(_MainTex, position.xy);
                 tex += tex2D(_MainTex, position.yz);
 				tex += tex2D(_MainTex, position.zx);
 				//tex /= 3;
 
+                //Apply sin wave to the y component
+				//position.y += 0.8 * sin(position.z * 0.5); // No Movemenet
+                //position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
+                //position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
+
+                //-> Spiral and Zoom
+                //-> Sin Wave + Zoom + Camera Offset from ShaderToy
+                //-> Bouncing Spheres
+                //-> Smoothstep Wave
+
+                position  = position * float3(1,1,0.8);//Scaling
+
                 float3 repeat  = position;
+                //repeat = ModOperator(position, 2) - 1;//Repeats in all planes
                 //Comment one out to repeat in specific plane
                 repeat.x = ModOperator(position.x, _value1) - 1;
                 repeat.z = ModOperator(position.z, _value2) - 1;
-                //repeat.y = ModOperator(position.y, _value3) - 1;
+                repeat.y = ModOperator(position.y, _value3) - 1;
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
 
                 return sphereDistance;
+
+				//return min(distanceToPlane, sphereDistance);
             }
-
-            //==================== Spiral Spheres =================
-    //         float GetDist(float3 position)
-    //         {
-    //             float distanceToPlane = position.y;
-
-    //             float3 spherePosition = float3(0,0,0);
-    //             float radius = 0.4;
-
-    //             float originalZ = position.z + (_Time.y);
-
-    //             float testSphere = length(position - spherePosition) - radius;
-    //             //return testSphere;
-
-    //             position.z += (_Time.y);//Movement but camera Movemenet is a bit better
-
-    //             //Spiral Rotation
-    //             position.xy = mul(position.xy, Rotation(_Time.y * 0.5 + originalZ * 0.1));
-                 
-    //             tex = tex2D(_MainTex, position.xy);
-    //             tex += tex2D(_MainTex, position.yz);
-				// tex += tex2D(_MainTex, position.zx);
-				// //tex /= 3;
-
-    //             //Apply sin wave to the y component
-				// //position.y += 0.8 * sin(position.z * 0.5); // No Movemenet
-    //             //position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
-    //             //position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
-
-    //             //-> Spiral and Zoom
-    //             //-> Sin Wave + Zoom + Camera Offset from ShaderToy
-    //             //-> Bouncing Spheres
-    //             //-> Smoothstep Wave
-
-    //             position  = position * float3(1,1,0.8);//Scaling
-
-    //             float3 repeat  = position;
-    //             //repeat = ModOperator(position, 2) - 1;//Repeats in all planes
-    //             //Comment one out to repeat in specific plane
-    //             repeat.x = ModOperator(position.x, _value1) - 1;
-    //             repeat.z = ModOperator(position.z, _value2) - 1;
-    //             repeat.y = ModOperator(position.y, _value3) - 1;
-
-    //             float sphereDistance = length(repeat - spherePosition) - radius;
-
-    //             return sphereDistance;
-
-				// //return min(distanceToPlane, sphereDistance);
-    //         }
 
             float RayMarch(float3 rayOrigin, float3 rayDirection, out int val)
             {
@@ -238,12 +208,15 @@ Shader "Unlit/Infinite3DCubes"
                float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //Creates Halo but the background is banded
                float greyCol = float3(0.2,0.2,0.2);
                float removeBanding = max(fogDepth, greyCol); //Removed circular bands in the background also maintins the Halo
-               float diffuseMask = saturate(col/float(MAXDIST/8)); //Giver perfect mask for sphere
+               float diffuseMask = saturate(col/float(MAXDIST/4)); //Giver perfect mask for sphere
+
+               //return diffuseMask * removeBanding; // Good Find
+               
                float inverseDiffuseMask = 1 - diffuseMask; //White sphere and rest is black
                float maskWithHalo = inverseDiffuseMask + removeBanding; //Center gradient white and grey rest
-               float maskForDiffuseHalo = InverseLerp(0.2, 1, maskWithHalo); //Center gradient white and black rest
+               float maskForDiffuseHalo = InverseLerp(1.5, 2, maskWithHalo); //Center gradient white and black rest
                float maskForHalo = step(0.1, diffuseMask) * maskForDiffuseHalo; //Sphere and background is black but halo is white. Can be used for halo color
-                
+
                float3 pointForLight = rayOrigin + col * rayDirection;
                float diffuseLight = GetLight(pointForLight);
                //tex = tex2D(_MainTex, pointForLight.xy);
@@ -251,7 +224,7 @@ Shader "Unlit/Infinite3DCubes"
 			   //tex += tex2D(_MainTex, pointForLight.zx);
 
                float3 finalCol = lerp( diffuseLight * tex,_FogColor, diffuseMask);
-               return float4 (finalCol, 1);
+               //return float4 (finalCol, 1);
                
                float3 finalColWithHalo = lerp( finalCol + _FogColor/5,1, maskForHalo);
 

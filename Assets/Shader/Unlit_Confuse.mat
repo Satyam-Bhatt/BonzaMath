@@ -30,9 +30,9 @@ Material:
     m_Ints: []
     m_Floats:
     - _AmbientLight: 0.1
-    - _CellSize: 3.72
+    - _CellSize: 5.15
     - _ColorBlendFactor: 1.33
-    - _FogStr: 0.063
+    - _FogStr: 0.1
     - _LightSpeed: 1
     - _RepeatSize: 1
     - _RotationSpeed: 0.5

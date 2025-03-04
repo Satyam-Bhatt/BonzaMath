@@ -1,4 +1,4 @@
-Shader "Unlit/Confuse"
+Shader "Unlit/CuteSister"
 {
     Properties
     {
@@ -144,55 +144,83 @@ Shader "Unlit/Confuse"
                 return lerp( d2, d1, h ) + k*h*(1.0-h);
             }
 
-                        //==================== Spiral Spheres =================
-            float GetDist(float3 position, out int objectID)
+            float GetDist(float3 position , out int objectID)
             {
-                objectID = 1;
-                
-                float distanceToPlane = position.y;
+                objectID = OBJ_NONE;
 
-                float3 spherePosition = float3(0,0,0);
+                position.z = position.z + _Time.y;
+                position.x = position.x + _Time.y * 0.5;
+                float originalZ = position.z;
+				float originalX = position.x;
+
+                float distanceToPlane = position.y + sin(originalZ * 1 + _Time.y * 4) * 0.1 + sin(originalX * 1 + _Time.y * 4) * 0.1;
+                float minDist = distanceToPlane;
+				objectID = OBJ_PLANE;
+
+                // Define orbit center and radius
+                float3 orbitCenter = float3(0, 0, 0); // Change this to your desired center point
+
+                // Calculate orbit position
+                float orbitX = orbitCenter.x + 4 * sin(_Time.y * 1) + _Time.y * 0.5;
+                float orbitZ = orbitCenter.z + 5 * cos(_Time.y * 2);
+
+                float v = 6;
+                v += _Time.y;
+                float3 positionForTorus = position.xzy - float3(orbitX,v,orbitZ);
+                positionForTorus.xy = mul(positionForTorus.xy, Rotation(_Time.y * 2));
+                float torus = sdTorus(positionForTorus, float2(0.8, 0.08));
+
+                float3 positionForTorus2 = position.xzy - float3(orbitX,v,orbitZ);
+                positionForTorus2.yz = mul(positionForTorus2.yz, Rotation(-_Time.y * 3));
+				float torus2 = sdTorus(positionForTorus2, float2(0.569, 0.05));
+
+                float3 positionForTorus3 = position.xzy - float3(orbitX,v,orbitZ);
+                positionForTorus3.xy = mul(positionForTorus3.xy, Rotation(-_Time.y * 4));
+				float torus3 = sdTorus(positionForTorus3, float2(0.36, 0.06));
+
+                float3 positionForSphere = position.xyz - float3(orbitX,orbitZ,v);
+				float sphere_Center = sdSphere(positionForSphere, 0.2);
+
+                float3 spherePosition = float3(0,0,1);
                 float radius = 0.4;
 
-                float originalZ = position.z + (_Time.y);
-
-                float testSphere = length(position - spherePosition) - radius;
-                //return testSphere;
-
-                position.z += (_Time.y);//Movement but camera Movemenet is a bit better
-
-                //Spiral Rotation
-                position.xy = mul(position.xy, Rotation(_Time.y * 0.5 + originalZ * 0.1));
-                 
-                tex = tex2D(_MainTex, position.xy);
-                tex += tex2D(_MainTex, position.yz);
-				tex += tex2D(_MainTex, position.zx);
-				//tex /= 3;
-
-                //Apply sin wave to the y component
-				//position.y += 0.8 * sin(position.z * 0.5); // No Movemenet
-                //position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
-                //position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
-
-                //-> Spiral and Zoom
-                //-> Sin Wave + Zoom + Camera Offset from ShaderToy
-                //-> Bouncing Spheres
-                //-> Smoothstep Wave
-
-                position  = position * float3(1,1,0.8);//Scaling
+                position.y += (smoothstep(0,2,sin(originalZ * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1) * 2);
+                position.y += (smoothstep(0,2,sin(originalX * 1 + _Time.y * 4)) * clamp(hash(floor(originalZ)),0,1) * 2);
 
                 float3 repeat  = position;
-                //repeat = ModOperator(position, 2) - 1;//Repeats in all planes
                 //Comment one out to repeat in specific plane
                 repeat.x = ModOperator(position.x, _value1) - 1;
                 repeat.z = ModOperator(position.z, _value2) - 1;
-                repeat.y = ModOperator(position.y, _value3) - 1;
+                //repeat.y = ModOperator(position.y, _value3) - 1;
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
 
-                return sphereDistance;
+                if(sphere_Center < minDist)
+                {
+					objectID = OBJ_SPHERE_SINGLE;
+					minDist = sphere_Center;
+				}
 
-				//return min(distanceToPlane, sphereDistance);
+                if(torus < minDist || torus2 < minDist || torus3 < minDist)
+                {
+					objectID = OBJ_TORUS;
+					minDist = torus3;
+                }
+
+                if(sphereDistance < minDist)
+                {
+                    objectID = OBJ_SPHERE;
+                    minDist = sphereDistance;
+                }
+
+                float ground = opSmoothUnion(distanceToPlane, sphereDistance, 0.6);
+                float rotatingSpheres = opSmoothUnion(torus2, torus, 0.2);
+				rotatingSpheres = opSmoothUnion(rotatingSpheres, torus3, 0.2);
+                rotatingSpheres = opSmoothUnion(rotatingSpheres, sphere_Center, 0.2);
+
+                float finalDist = opSmoothUnion(ground, rotatingSpheres, 0.8);
+
+                return finalDist;
             }
 
             float RayMarch(float3 rayOrigin, float3 rayDirection, out int hitObjectID)
