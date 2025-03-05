@@ -149,6 +149,9 @@ public class objectManager : MonoBehaviour
 
             hitObject = null;
 
+            //Camera Shake
+            GameManager.Instance.ShakeCamera();
+
             //Play place sound
             AudioManager.Instance.Place();
         }
