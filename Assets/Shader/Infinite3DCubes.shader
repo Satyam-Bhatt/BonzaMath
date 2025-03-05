@@ -8,6 +8,8 @@ Shader "Unlit/Infinite3DCubes"
         _value3("Value3" , Float) = 0
         _FogStr("fogstr" , Float) = 0
         _FogColor("FogColor", Color) = (0.5, 0.6, 0.7, 1)
+        _LightColor("Light Color", Color) = (1.0, 0.9, 0.8, 1.0)
+
     }
     SubShader
     {
@@ -24,6 +26,7 @@ Shader "Unlit/Infinite3DCubes"
             #define MAXDIST 100
             #define MINDIST 0.001
             #define SURF_DIST 1
+            #define PI 3.141592653589793
 
             #include "UnityCG.cginc"
 
@@ -40,7 +43,7 @@ Shader "Unlit/Infinite3DCubes"
             };
 
             sampler2D _MainTex;
-            float4 _MainTex_ST, _FogColor, tex;
+            float4 _MainTex_ST, _FogColor, tex, _LightColor;
             float _value1, _value2, _value3, _FogStr;
 
             v2f vert (appdata v)
@@ -91,20 +94,21 @@ Shader "Unlit/Infinite3DCubes"
                 float testSphere = length(position - spherePosition) - radius;
                 //return testSphere;
 
-                position.z += (_Time.y);//Movement but camera Movemenet is a bit better
+                //position.z += (_Time.y);//Movement but camera Movemenet is a bit better
 
                 //Spiral Rotation
                 position.xy = mul(position.xy, Rotation(_Time.y * 0.5 + originalZ * 0.1));
                  
-                tex = tex2D(_MainTex, position.xy);
-                tex += tex2D(_MainTex, position.yz);
-				tex += tex2D(_MainTex, position.zx);
 				//tex /= 3;
 
                 //Apply sin wave to the y component
 				//position.y += 0.8 * sin(position.z * 0.5); // No Movemenet
-                //position.y += 0.8 * sin(originalZ * 0.5 + _Time.y * 1); //Serpent movement cool
-                //position.x += 0.5 * cos(originalZ * 0.5 + _Time.y * 1); //Spiral Movement xy
+                position.y += 0.2 * sin(originalZ * 0.5 + _Time.y * 1.5); //Serpent movement cool
+                position.x += 0.2 * cos(originalZ * 0.5 + _Time.y * 1.5); //Spiral Movement xy
+
+                tex = tex2D(_MainTex, position.xy);
+                tex += tex2D(_MainTex, position.yz);
+				tex += tex2D(_MainTex, position.zx);
 
                 //-> Spiral and Zoom
                 //-> Sin Wave + Zoom + Camera Offset from ShaderToy
@@ -117,7 +121,7 @@ Shader "Unlit/Infinite3DCubes"
                 //repeat = ModOperator(position, 2) - 1;//Repeats in all planes
                 //Comment one out to repeat in specific plane
                 repeat.x = ModOperator(position.x, _value1) - 1;
-                repeat.z = ModOperator(position.z, _value2) - 1;
+                repeat.z = ModOperator(position.z, _value2) - 0.5;
                 repeat.y = ModOperator(position.y, _value3) - 1;
 
                 float sphereDistance = length(repeat - spherePosition) - radius;
@@ -162,19 +166,35 @@ Shader "Unlit/Infinite3DCubes"
                 return normalize(normal);
             }
 
-            float GetLight(float3 position)
+            float ease_step(float x, float k) {
+                return floor(x) + (fmod(x, 1.0) < k ? smoothstep(0.0, 1.0, smoothstep(0.0, 1.0, (x - floor(x)) / k)) : 1.0);
+            }
+
+            float3 GetLight(float3 position)
             {
-                float3 lightPosition = float3(0,5,-3);
-                float3 lightVector = normalize(lightPosition - position);
+                // Multiple light sources for more interesting lighting
+                float3 lightPosition1 = float3(2 * sin(_Time.y * 0.5), 4, -5);
+                float3 lightPosition2 = float3(-3, 2, -1);
+                lightPosition2.xz = mul(lightPosition2.xz, Rotation(ease_step(_Time.y * 0.25, 0.25) * (PI/2)));
+                lightPosition2.xy = mul(lightPosition2.xy, Rotation(ease_step(_Time.y * 0.25 + 0.5, 0.25) * (PI/2)));
+                
                 float3 normal = GetNormal(position);
-                float diffuseLight = saturate(dot(lightVector, normal));
-
-                //Shadow - Turned off becaue of artifacting
-                // int val = 0;
-                // float shadowToLight = RayMarch(position + normal * SURF_DIST, lightPosition, val);
-                // if(shadowToLight < length(lightPosition - position)) diffuseLight = diffuseLight * 0.1;
-
-                return diffuseLight;
+                
+                // Light 1 (moving)
+                float3 lightVector1 = normalize(lightPosition1 - position);
+                float diffuse1 = max(dot(normal, lightVector1), 0.0);
+                
+                // Light 2 (static)
+                float3 lightVector2 = normalize(lightPosition2 - position);
+                float diffuse2 = max(dot(normal, lightVector2), 0.0);
+                
+                // Combine lights with colors
+                float3 light = _LightColor.rgb * diffuse1 * 0.7 + float3(0.5, 0.7, 1.0) * diffuse2 * 1;
+                
+                // Add ambient light
+                light += float3(0.1, 0.1, 0.15);
+                
+                return light;
             }
 
             float Random(float2 uv)
@@ -192,51 +212,95 @@ Shader "Unlit/Infinite3DCubes"
                 return clamp((v - a) / (b - a), 0, 1);
             }
 
-            float4 frag (v2f i) : SV_Target
-            {
-                float2 uv = i.uv * 2 - 1; //Center the scene
-                uv.x = uv.x * 0.8/1;
+            float3 AnimateCamera(float3 ro, float3 rd)
+{
+    ro.y += sin(_Time.y * 0.5) * 0.1;
+    ro.x += cos(_Time.y * 0.3) * 0.1;
+    return ro;
+}
 
-               //float3 rayOrigin  = float3(0,1,-3 + _Time.y); //Camera Movemenet
-               float3 rayOrigin  = float3(0,2,-3); //Camera
-               float3 rayDirection = normalize(float3(uv.x, uv.y,1));
+float3 ApplyBloom(float3 color, float2 uv)
+{
+    float2 center = uv - 0.5;
+    float vignette = 1.0 - dot(center, center);
+    vignette = pow(vignette, 2.0);
+    return color * vignette;
+}
 
-               int val = 0;
-               float col = RayMarch(rayOrigin, rayDirection, val);
+float3 ApplyColorGrading(float3 color)
+{
+    float3 gradedColor = pow(color, 2); // Gamma correction
+    gradedColor = lerp(gradedColor, gradedColor * float3(1.1, 1.0, 0.9), 0.5); // Warm tint
+    return gradedColor;
+}
 
-               //if we don't covert to float then the int division result is truncated.
-               float fogDepth = saturate(float(val)/float(60) * _FogStr) ; //Creates Halo but the background is banded
-               float greyCol = float3(0.2,0.2,0.2);
-               float removeBanding = max(fogDepth, greyCol); //Removed circular bands in the background also maintins the Halo
-               float diffuseMask = saturate(col/float(MAXDIST/4)); //Giver perfect mask for sphere
+float3 GetObjectColor(float3 position, float3 normal)
+{
+    float3 baseColor = float3(0.8, 0.3, 0.2);
+    float3 accentColor = float3(0.2, 0.5, 0.8);
+    float3 gradientColor = lerp(baseColor, accentColor, smoothstep(-1.0, 1.0, position.y));
+    return gradientColor * (normal.y * 0.5 + 0.5);
+}
 
-               //return diffuseMask * removeBanding; // Good Find
-               
-               float inverseDiffuseMask = 1 - diffuseMask; //White sphere and rest is black
-               float maskWithHalo = inverseDiffuseMask + removeBanding; //Center gradient white and grey rest
-               float maskForDiffuseHalo = InverseLerp(1.5, 2, maskWithHalo); //Center gradient white and black rest
-               float maskForHalo = step(0.1, diffuseMask) * maskForDiffuseHalo; //Sphere and background is black but halo is white. Can be used for halo color
+float AmbientOcclusion(float3 p, float3 n)
+{
+    float occlusion = 0.0;
+    float weight = 1.0;
+    for (int i = 0; i < 5; i++)
+    {
+        float len = 0.01 + 0.02 * float(i * i);
+        float dist = GetDist(p + n * len);
+        occlusion += (len - dist) * weight;
+        weight *= 0.85;
+    }
+    return clamp(1.0 - occlusion, 0.0, 1.0);
+}
 
-               float3 pointForLight = rayOrigin + col * rayDirection;
-               float diffuseLight = GetLight(pointForLight);
-               //tex = tex2D(_MainTex, pointForLight.xy);
-			   //tex += tex2D(_MainTex, pointForLight.yz);
-			   //tex += tex2D(_MainTex, pointForLight.zx);
+            float4 frag(v2f i) : SV_Target
+{
+    float2 uv = i.uv * 2 - 1;
+    uv.x *= 0.8;
 
-               float3 finalCol = lerp( diffuseLight * tex,_FogColor, diffuseMask);
-               //return float4 (finalCol, 1);
-               
-               float3 finalColWithHalo = lerp( finalCol + _FogColor/5,1, maskForHalo);
+    float3 rayOrigin = float3(0, 2, -3);
+    float3 rayDirection = normalize(float3(uv.x, uv.y, 1));
 
-               float3 haloColor = maskForHalo * _FogColor * 5;
+    rayOrigin = AnimateCamera(rayOrigin, rayDirection);
 
-               //return float4(finalCol, 1.0);
-               return float4(finalColWithHalo + haloColor, 1.0);
+    int steps = 0;
+    float dist = RayMarch(rayOrigin, rayDirection, steps);
 
-               //col  = col/8;
-                
-               //return col;
-            }
+    float3 color = float3(0, 0, 0);
+
+    if (dist < MAXDIST)
+    {
+        float3 hitPos = rayOrigin + dist * rayDirection;
+        float3 normal = GetNormal(hitPos);
+
+        // Lighting
+        float3 light = GetLight(hitPos);
+        float ao = AmbientOcclusion(hitPos, normal);
+
+        // Object color
+        float3 objectColor = GetObjectColor(hitPos, normal);
+
+        // Combine lighting and color
+        color = objectColor * light * ao;
+
+        // Rim lighting
+        float rim = 1.0 - max(dot(normal, -rayDirection), 0.0);
+        rim = pow(rim, 2.0);
+        color += float3(0.5, 0.7, 1.0) * rim * 1;
+    }
+
+    // Post-processing
+    color = ApplyBloom(color, i.uv);
+    color = ApplyColorGrading(color);
+    float diffuseMask = saturate(dist/float(_FogStr));
+    float3 finalCol = lerp( color * tex,_FogColor, diffuseMask);
+
+
+    return float4(finalCol, 1.0);
+}
             ENDCG
         }
     }
