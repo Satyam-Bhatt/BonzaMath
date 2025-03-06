@@ -70,7 +70,6 @@ public class OperatorCalculatingScript : MonoBehaviour
         {
             allNumbers = allNumbers.Remove(allNumbers.Length - 1);
             allNumbers = allNumbers.Replace(" ", "");
-            //Debug.Log(allNumbers);
             
             totalText.text = allNumbers + "=" + EquationEvaluator.Evaluate(allNumbers);
         }

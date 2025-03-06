@@ -2,10 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ButtonManager : MonoBehaviour
 {
     [SerializeField] private GameObject _pauseMenu;
+
+    //-----------------MATERIALS FOR MENU-----------------
+    [SerializeField] private Material[] materials;
+    private int counter = 0;
 
     private void Start()
     {
@@ -16,6 +21,12 @@ public class ButtonManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            if (!_pauseMenu.activeSelf == true)
+            {
+                _pauseMenu.GetComponent<Image>().material = materials[counter];
+                counter++;
+                if(counter == materials.Length) counter = 0;
+            }
             _pauseMenu.SetActive(!_pauseMenu.activeSelf);
         }
     }
