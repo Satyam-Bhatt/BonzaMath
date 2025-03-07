@@ -29,7 +29,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _CellSize: 4.74
+    - _CellSize: 8.27
     - _FogStr: 0.0692
     - _value1: 2
     - _value2: 2
