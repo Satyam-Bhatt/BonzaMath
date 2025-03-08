@@ -24,13 +24,13 @@ public class GameManager : MonoBehaviour
     public bool tutorialState = false;
 
     [Range(0.1f, 1f)]
-    public float shakeMagnitude = 0.3f;
+    public float shakeMagnitude = 0.2f;
 
     [Range(0.1f, 2f)]
-    public float shakeDuration = 0.5f;
+    public float shakeDuration = 0.2f;
 
     [Range(1f, 10f)]
-    public float shakeDecay = 3f;
+    public float shakeDecay = 10f;
 
     private Vector3 originalPosition;
     private float shakeIntensity;

@@ -924,6 +924,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 761421969285394199, guid: 8bacf0c56100ab148ace074d41e25e08, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 761421969285394199, guid: 8bacf0c56100ab148ace074d41e25e08, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 85ac55597b97403c82fc6601a93cf241, type: 3}
     - target: {fileID: 1579583676759987518, guid: 8bacf0c56100ab148ace074d41e25e08, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -0.000015258789
@@ -1144,6 +1152,22 @@ PrefabInstance:
       propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5760633024725541224, guid: 8bacf0c56100ab148ace074d41e25e08, type: 3}
+      propertyPath: materials.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5760633024725541224, guid: 8bacf0c56100ab148ace074d41e25e08, type: 3}
+      propertyPath: materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e883a6b7d2ef9f946a5f929718449c5d, type: 2}
+    - target: {fileID: 5760633024725541224, guid: 8bacf0c56100ab148ace074d41e25e08, type: 3}
+      propertyPath: materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1be1664de30330b4fbe20baa2c084f21, type: 2}
+    - target: {fileID: 5760633024725541224, guid: 8bacf0c56100ab148ace074d41e25e08, type: 3}
+      propertyPath: materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: 3a468c782a565e2419226b49eb0633f6, type: 2}
     - target: {fileID: 6114443590188830319, guid: 8bacf0c56100ab148ace074d41e25e08, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -29.9
@@ -1321,6 +1345,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <win_Total>k__BackingField: 6
+  tutorialState: 0
+  shakeMagnitude: 0.2
+  shakeDuration: 0.2
+  shakeDecay: 10
 --- !u!4 &1915207049
 Transform:
   m_ObjectHideFlags: 0
