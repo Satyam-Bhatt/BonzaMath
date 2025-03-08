@@ -2,7 +2,6 @@ Shader "Unlit/InfiniteBoxFrame"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
         _FogStr("Fog Strength" , Range(0.01, 0.1)) = 0.03
         _FogColor("Fog Color", Color) = (0.5, 0.6, 0.7, 1.0)
         _LightColor("Light Color", Color) = (1.0, 0.9, 0.8, 1.0)
@@ -39,8 +38,6 @@ Shader "Unlit/InfiniteBoxFrame"
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
             float _FogStr;
             float4 _FogColor, _LightColor;
             float _CellSize;
@@ -65,18 +62,10 @@ Shader "Unlit/InfiniteBoxFrame"
                 return x - y * floor(x/y);
             }
 
-            float hash(float n) 
-            {
-                return frac(sin(n) * 43758.5453);
-            }
-
             float ease_step(float x, float k) {
                 return floor(x) + (fmod(x, 1.0) < k ? smoothstep(0.0, 1.0, smoothstep(0.0, 1.0, (x - floor(x)) / k)) : 1.0);
             }
 
-            float length2(float3 p) { p=p*p; return sqrt(p.x+p.y+p.z); }
-            float length6(float3 p) { p=p*p*p; p=p*p; return pow(p.x+p.y+p.z,1.0/6.0); }
-            float length8(float3 p) { p=p*p; p=p*p; p=p*p; return pow(p.x+p.y+p.z,1.0/8.0); }
             float length8(float2 p) { p=p*p; p=p*p; p=p*p; return pow(p.x+p.y,1.0/8.0); }
             float length2(float2 p) { return sqrt(p.x*p.x+p.y*p.y); }
 
@@ -153,7 +142,7 @@ Shader "Unlit/InfiniteBoxFrame"
                 {
                     float3 firstPointOfContact = rayOrigin + distanceOrigin * rayDirection;
                     float distanceToTheObject = GetDist(firstPointOfContact);
-                    distanceOrigin += distanceToTheObject * 0.95; // Slightly reduce step size for better accuracy
+                    distanceOrigin += distanceToTheObject * 0.95;
                     
                     if(distanceOrigin > MAXDIST || distanceToTheObject < MINDIST) break;
                 }
@@ -209,19 +198,20 @@ Shader "Unlit/InfiniteBoxFrame"
 
             float Dither(float2 uv)
             {
-                return Random(uv) * 0.03 - 0.015; // Small random offset for dithering
+                return Random(uv) * 0.03 - 0.015;
             }
 
             float4 frag(v2f i) : SV_Target
             {
-                float2 uv = i.uv * 2 - 1; // Center the scene
-                uv.x *= 0.8; // Adjust aspect ratio
+                float2 uv = i.uv * 2 - 1; 
+                uv.x *= 0.8; 
                 
                 float3 rayOrigin = float3(0,0,_Time.y * 2);
                 
                 // Ray direction with proper camera orientation
                 float3 rayDirection = normalize(float3(uv.x, uv.y,1));
 
+                //90 degree rotation
                 rayDirection.xz = mul(rayDirection.xz, Rotation(ease_step(_Time.y * 0.25, 0.25) * (PI/2)));
                 rayDirection.xy = mul(rayDirection.xy, Rotation(ease_step(_Time.y * 0.25 + 0.5, 0.25) * (PI/2)));
                 
@@ -229,7 +219,7 @@ Shader "Unlit/InfiniteBoxFrame"
                 int steps = 0;
                 float dist = RayMarch(rayOrigin, rayDirection, steps);
                 
-                // Calculate fog based on distance and steps
+                // Calculate fog based on distance
                 float fogAmount = 1.0 - exp2(-dist * _FogStr);
                 
                 // Initial color (black)
