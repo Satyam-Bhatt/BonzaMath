@@ -50,4 +50,15 @@ public class ButtonManager : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+
+    public void Pause_InGame()
+    {
+        if (!_pauseMenu.activeSelf == true)
+        {
+            _pauseMenu.GetComponent<Image>().material = materials[counter];
+            counter++;
+            if (counter == materials.Length) counter = 0;
+        }
+        _pauseMenu.SetActive(!_pauseMenu.activeSelf);
+    }
 }
