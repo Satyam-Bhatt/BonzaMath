@@ -39,4 +39,15 @@ public class ButtonManager : MonoBehaviour
     {
         SceneManager.LoadScene(num);
     }
+    public void NextLevel_InGame()
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        currentSceneIndex++;
+        SceneManager.LoadScene(currentSceneIndex);
+    }
+
+    public void RestartLevel_InGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
 }
